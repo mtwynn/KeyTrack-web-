@@ -52,6 +52,7 @@ class App extends React.Component {
       },
       user_id: "",
       access_token: "",
+      user_name: "",
     };
 
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
@@ -64,9 +65,11 @@ class App extends React.Component {
         `https://api.spotify.com/v1/me?access_token=${params.access_token}`
       ).then((user) => {
         console.log("User id: " + user.data.id);
+        console.log(user);
         this.setState({
           user_id: user.data.id,
           access_token: params.access_token,
+          user_name: user.data.display_name,
         });
       });
     }
@@ -102,6 +105,9 @@ class App extends React.Component {
           </GreenButton>
         </a>
 
+        <div>
+          Logged in as: <b>{this.state.user_name}</b>
+        </div>
         <div className="current-song">
           <CurrentSong token={this.state.access_token} />
         </div>

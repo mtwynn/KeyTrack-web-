@@ -13,8 +13,16 @@ var cors = require("cors");
 var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
 
-var client_id = "CLIENT_ID"; // Your client id
-var client_secret = "CLIENT_SECRET"; // Your secret
+var path = require("path");
+
+var fs = require("fs");
+let rawdata = fs.readFileSync(
+  path.resolve(__dirname, "..", "../../credentials.json")
+);
+let credentials = JSON.parse(rawdata);
+
+var client_id = credentials.id; // Your client id
+var client_secret = credentials.secret; // Your secret
 var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
 
 /**
