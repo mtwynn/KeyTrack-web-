@@ -111,7 +111,9 @@ let CurrentSong = (props) => {
         );
         setImage(response === "" ? null : response.item.album.images[0].url);
       } catch (error) {
-        console.log(error);
+        if (error instanceof TypeError) {
+          setName("Nothing currently playing");
+        }
       }
     });
   };

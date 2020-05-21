@@ -76,6 +76,7 @@ class App extends React.Component {
   }
 
   getHashParams() {
+    /*
     var hashParams = {};
     var e,
       r = /([^&;=]+)=?([^&;]*)/g,
@@ -86,7 +87,13 @@ class App extends React.Component {
 
     console.log("Hash Params: ");
     console.log(hashParams);
-    return hashParams;
+    return hashParams;*/
+
+    var urlString = window.location.href;
+    var url = new URL(urlString);
+    var a_token = new URLSearchParams(url.search).get("access_token");
+    var r_token = new URLSearchParams(url.search).get("refresh_token");
+    return { access_token: a_token, refresh_token: r_token };
   }
 
   getUserPlaylists() {
@@ -99,7 +106,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <a href="http://localhost:8888">
+        <a href="https://keytrack.herokuapp.com/">
           <GreenButton variant="contained" color="primary">
             Login with Spotify
           </GreenButton>
@@ -115,6 +122,30 @@ class App extends React.Component {
           <Button variant="contained" onClick={this.getUserPlaylists}>
             List All Playlists
           </Button>
+        </div>
+
+        <div>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              const url = "https://www.spotify.com/logout/";
+              const spotifyLogoutWindow = window.open(
+                url,
+                "Spotify Logout",
+                "width=700,height=500,top=40,left=40"
+              );
+              setTimeout(() => spotifyLogoutWindow.close(), 2000);
+            }}
+          >
+            Log Out
+          </Button>
+        </div>
+        <div>
+          <Typography variant="overline">Powered by Spotify</Typography>
+        </div>
+        <div>
+          <Typography variant="caption">Made by Tam Nguyen</Typography>
         </div>
       </div>
     );
