@@ -13,19 +13,18 @@ var cors = require("cors");
 var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
 
-/*
 var path = require("path");
 
 var fs = require("fs");
 let rawdata = fs.readFileSync(
   path.resolve(__dirname, "..", "../credentials.json")
 );
-let credentials = JSON.parse(rawdata);*/
+let credentials = JSON.parse(rawdata);
 
-var client_id = process.env.CLIENT_ID; // Your client id
-var client_secret = process.env.CLIENT_SECRET; // Your secret
-//var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
-var redirect_uri = "https://keytrack.herokuapp.com/callback/";
+var client_id = credentials.id; // Your client id
+var client_secret = credentials.secret; // Your secret
+var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
+//var redirect_uri = "https://keytrack.herokuapp.com/callback/";
 
 /**
  * Generates a random string containing numbers and letters
@@ -129,7 +128,7 @@ app.get("/callback", function (req, res) {
 
         res.redirect(
           302,
-          "https://key-track.netlify.app?" +
+          "http://localhost:3000/#" +
             querystring.stringify({
               access_token: access_token,
               refresh_token: refresh_token,

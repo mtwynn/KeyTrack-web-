@@ -142,6 +142,7 @@ let CurrentSong = (props) => {
             color="primary"
             onClick={getNowPlaying}
             className={classes.margin}
+            disabled={props.token ? false : true}
           >
             Current Song
           </GreenButton>

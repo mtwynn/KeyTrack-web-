@@ -1,10 +1,18 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
+
 import Spotify from "spotify-web-api-js";
-import { Button, Typography, makeStyles, withStyles } from "@material-ui/core";
+import {
+  Grid,
+  Button,
+  Typography,
+  makeStyles,
+  withStyles,
+} from "@material-ui/core";
+import FadeIn from "react-fade-in";
 
 import CurrentSong from "./components/CurrentSong/CurrentSong";
+import PLLibrary from "./components/PLLibrary/PLLibrary";
 
 import Axios from "axios";
 
@@ -53,6 +61,8 @@ class App extends React.Component {
       user_id: "",
       access_token: "",
       user_name: "",
+      showPlaylists: false,
+      pllibrary: null,
     };
 
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
@@ -87,7 +97,10 @@ class App extends React.Component {
 
     console.log("Hash Params: ");
     console.log(hashParams);
-    return hashParams;*/
+    return hashParams;
+    */
+
+    // For use in production server
 
     var urlString = window.location.href;
     var url = new URL(urlString);
@@ -98,55 +111,88 @@ class App extends React.Component {
 
   getUserPlaylists() {
     spotifyWebApi.getUserPlaylists(this.state.user_id).then((response) => {
-      console.log("Playlists: ");
-      console.log(response);
+      this.setState({
+        showPlaylists: !this.state.showPlaylists,
+        pllibrary: response,
+      });
     });
   }
 
   render() {
     return (
       <div className="App">
-        <a href="https://keytrack.herokuapp.com/">
-          <GreenButton variant="contained" color="primary">
-            Login with Spotify
-          </GreenButton>
-        </a>
+        <FadeIn transitionDuration={1000}>
+          <a href="https://keytrack.herokuapp.com/">
+            <GreenButton
+              variant="contained"
+              color="primary"
+              style={
+                this.state.loggedIn
+                  ? null
+                  : { animation: "float 1s ease-in-out infinite" }
+              }
+            >
+              Login with Spotify
+            </GreenButton>
+          </a>
 
-        <div>
-          Logged in as: <b>{this.state.user_name}</b>
-        </div>
-        <div className="current-song">
-          <CurrentSong token={this.state.access_token} />
-        </div>
-        <div>
-          <Button variant="contained" onClick={this.getUserPlaylists}>
-            List All Playlists
-          </Button>
-        </div>
+          <div>
+            Logged in as: <b>{this.state.user_name}</b>
+          </div>
+          <Grid container spacing={2}>
+            <Grid item xs={this.state.showPlaylists ? 4 : 12}>
+              <div className="current-song">
+                <CurrentSong token={this.state.access_token} />
+              </div>
+              <div>
+                <Button
+                  variant="contained"
+                  onClick={this.getUserPlaylists}
+                  disabled={!this.state.loggedIn}
+                >
+                  {this.state.showPlaylists
+                    ? "Close Playlist Library"
+                    : "Open Playlist Library"}
+                </Button>
+              </div>
 
-        <div>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-              const url = "https://www.spotify.com/logout/";
-              const spotifyLogoutWindow = window.open(
-                url,
-                "Spotify Logout",
-                "width=700,height=500,top=40,left=40"
-              );
-              setTimeout(() => spotifyLogoutWindow.close(), 2000);
-            }}
-          >
-            Log Out
-          </Button>
-        </div>
-        <div>
-          <Typography variant="overline">Powered by Spotify</Typography>
-        </div>
-        <div>
-          <Typography variant="caption">Made by Tam Nguyen</Typography>
-        </div>
+              <div>
+                <Button variant="contained">Key Calculator</Button>
+              </div>
+
+              <div>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => {
+                    console.log("logging out");
+                  }}
+                  disabled={!this.state.loggedIn}
+                >
+                  Log Out
+                </Button>
+              </div>
+            </Grid>
+
+            {this.state.showPlaylists ? (
+              <Grid item xs={8}>
+                <FadeIn transitionDuration={1000}>
+                  <PLLibrary
+                    token={this.state.access_token}
+                    pllibrary={this.state.pllibrary}
+                  />
+                </FadeIn>
+              </Grid>
+            ) : null}
+          </Grid>
+
+          <div>
+            <Typography variant="overline">Powered by Spotify</Typography>
+          </div>
+          <div>
+            <Typography variant="caption">Made by Tam Nguyen</Typography>
+          </div>
+        </FadeIn>
       </div>
     );
   }
