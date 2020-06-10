@@ -6,6 +6,8 @@ import {
   CardActions,
   CardContent,
   CardMedia,
+  CircularProgress,
+  Fade,
   Grid,
   Typography,
   makeStyles,
@@ -76,6 +78,8 @@ let CurrentSong = (props) => {
   let [bpm, setBpm] = React.useState("");
   let [mode, setMode] = React.useState(-1);
   let [image, setImage] = React.useState("");
+
+  let [loading, setLoading] = React.useState(false);
 
   let keyMap = {
     0: {
@@ -217,11 +221,13 @@ let CurrentSong = (props) => {
   spotifyWebApi.setAccessToken(props.token);
 
   const getNowPlaying = () => {
+    setLoading(true);
     spotifyWebApi.getMyCurrentPlaybackState().then((response) => {
       try {
         spotifyWebApi
           .getAudioAnalysisForTrack(response.item.id)
           .then((response) => {
+            setLoading(false);
             console.log(response);
             setBpm(Math.round(response.track.tempo));
             setKey(keyMap[response.track.key].key);
@@ -246,9 +252,9 @@ let CurrentSong = (props) => {
     <>
       <Card className={classes.root}>
         <CardMedia className={classes.media} image={image} />
-
         <CardContent>
           <Typography className={classes.text}>{name}</Typography>
+          {loading ? <CircularProgress style={{ color: "white" }} /> : null}
           <Typography variant="h3" className={classes.text}>
             {key}
           </Typography>
@@ -259,8 +265,9 @@ let CurrentSong = (props) => {
           <Typography variant="h6" className={classes.text}>
             {bpm ? `${bpm} BPM` : null}
           </Typography>
-          <Grid>
-            <Grid item spacing={2} justifyContent="space-between">
+
+          <Grid container spacing={2} justify="space-between">
+            <Grid item>
               <Typography variant="button" className={classes.text}>
                 {camelot ? `C: ${camelot}` : null}
               </Typography>

@@ -13,6 +13,7 @@ import FadeIn from "react-fade-in";
 
 import CurrentSong from "./components/CurrentSong/CurrentSong";
 import PLLibrary from "./components/PLLibrary/PLLibrary";
+import KeyCalculator from "./utils/KeyCalculator";
 
 import Axios from "axios";
 
@@ -65,10 +66,12 @@ class App extends React.Component {
       access_token: "",
       user_name: "",
       showPlaylists: false,
+      showKeyCalculator: false,
       pllibrary: null,
     };
 
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
+    this.openKeyCalculator = this.openKeyCalculator.bind(this);
 
     if (params.access_token) {
       console.log("Access token accepted");
@@ -120,6 +123,12 @@ class App extends React.Component {
     });
   }
 
+  openKeyCalculator() {
+    this.setState({
+      showKeyCalculator: !this.state.showKeyCalculator,
+    });
+  }
+
   render() {
     return (
       <div className="App">
@@ -159,7 +168,9 @@ class App extends React.Component {
               </div>
 
               <div>
-                <Button variant="contained">Key Calculator</Button>
+                <Button variant="contained" onClick={this.openKeyCalculator}>
+                  Key Calculator
+                </Button>
               </div>
 
               <div>
@@ -187,7 +198,14 @@ class App extends React.Component {
               </Grid>
             ) : null}
           </Grid>
-
+          {this.state.showKeyCalculator ? (
+            <FadeIn transitionDuration={1000}>
+              <KeyCalculator
+                open={this.state.showKeyCalculator}
+                onClose={this.openKeyCalculator}
+              />
+            </FadeIn>
+          ) : null}
           <div>
             <Typography variant="overline">Powered by Spotify</Typography>
           </div>
