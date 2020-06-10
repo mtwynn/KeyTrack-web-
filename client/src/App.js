@@ -18,6 +18,9 @@ import Axios from "axios";
 
 const spotifyWebApi = new Spotify();
 
+let prodServer = "https://keytrack.herokuapp.com/";
+let localServer = "http://localhost:8888/";
+
 const GreenButton = withStyles((theme) => ({
   root: {
     color: "#FFFFFF",
@@ -86,7 +89,6 @@ class App extends React.Component {
   }
 
   getHashParams() {
-    /*
     var hashParams = {};
     var e,
       r = /([^&;=]+)=?([^&;]*)/g,
@@ -98,15 +100,15 @@ class App extends React.Component {
     console.log("Hash Params: ");
     console.log(hashParams);
     return hashParams;
-    */
 
     // For use in production server
-
+    /*
     var urlString = window.location.href;
     var url = new URL(urlString);
     var a_token = new URLSearchParams(url.search).get("access_token");
     var r_token = new URLSearchParams(url.search).get("refresh_token");
     return { access_token: a_token, refresh_token: r_token };
+    */
   }
 
   getUserPlaylists() {
@@ -122,7 +124,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <FadeIn transitionDuration={1000}>
-          <a href="https://keytrack.herokuapp.com/">
+          <a href={localServer}>
             <GreenButton
               variant="contained"
               color="primary"
