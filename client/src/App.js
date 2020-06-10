@@ -131,7 +131,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="App">
+      <div className="App m-div">
         <FadeIn transitionDuration={1000}>
           <a href={localServer}>
             <GreenButton
@@ -147,15 +147,15 @@ class App extends React.Component {
             </GreenButton>
           </a>
 
-          <div>
+          <div className="m-div">
             Logged in as: <b>{this.state.user_name}</b>
           </div>
           <Grid container spacing={2}>
             <Grid item xs={this.state.showPlaylists ? 4 : 12}>
-              <div className="current-song">
+              <div className="current-song m-div">
                 <CurrentSong token={this.state.access_token} />
               </div>
-              <div>
+              <div className="m-div">
                 <Button
                   variant="contained"
                   onClick={this.getUserPlaylists}
@@ -167,13 +167,13 @@ class App extends React.Component {
                 </Button>
               </div>
 
-              <div>
+              <div className="m-div">
                 <Button variant="contained" onClick={this.openKeyCalculator}>
                   Key Calculator
                 </Button>
               </div>
 
-              <div>
+              <div className="m-div">
                 <Button
                   variant="contained"
                   color="secondary"
@@ -206,10 +206,10 @@ class App extends React.Component {
               />
             </FadeIn>
           ) : null}
-          <div>
+          <div className="m-div">
             <Typography variant="overline">Powered by Spotify</Typography>
           </div>
-          <div>
+          <div className="m-div">
             <Typography variant="caption">Made by Tam Nguyen</Typography>
           </div>
         </FadeIn>

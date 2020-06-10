@@ -46,6 +46,7 @@ const useStyles = makeStyles((theme) => ({
   media: {
     height: "11rem",
     width: "11rem",
+    margin: "1rem",
   },
   margin: {
     margin: theme.spacing(1),
@@ -291,7 +292,7 @@ let CurrentSong = (props) => {
           </GreenButton>
         </CardActions>
       </Card>
-      <div></div>
+      <div className="m-div"></div>
     </>
   );
 };

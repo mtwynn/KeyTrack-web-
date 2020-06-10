@@ -37,9 +37,9 @@
   }
 }
 
-div,
-button {
-  margin: 15px;
+.m-div,
+.m-button {
+  margin: 0.8rem;
 }
 
 a {

@@ -81,7 +81,7 @@ let Playlist = (props) => {
   ];
 
   return (
-    <div>
+    <div className="m-div">
       <Dialog
         fullScreen={fullScreen}
         open={props.open}
