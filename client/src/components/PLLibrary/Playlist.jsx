@@ -3,7 +3,11 @@ import React from "react";
 import {
   makeStyles,
   withStyles,
+  Avatar,
   Dialog,
+  Input,
+  InputAdornment,
+  FormControl,
   Table,
   TableCell,
   TableRow,
@@ -17,7 +21,7 @@ import {
 } from "@material-ui/core";
 
 import { useTheme } from "@material-ui/core/styles";
-import { Close } from "@material-ui/icons";
+import { Close, Search } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -25,7 +29,14 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#191414",
   },
   title: {
+    flex: 0,
+  },
+  search: {
     flex: 1,
+    color: "white",
+    marginRight: theme.spacing(3),
+    marginLeft: theme.spacing(3),
+    borderWidth: "10px",
   },
 }));
 
@@ -44,6 +55,11 @@ let Playlist = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("lg"));
+  const [search, setSearch] = React.useState("");
+
+  let handleChange = (event) => {
+    setSearch(event.target.value);
+  };
 
   const reducer = (allContributors, artist) => [
     ...allContributors,
@@ -92,14 +108,31 @@ let Playlist = (props) => {
             <Typography variant="h6" className={classes.title}>
               {props.playlist.name}
             </Typography>
-            <IconButton
-              edge="end"
-              color="inherit"
-              onClick={props.handlePlaylistClose}
-              aria-label="close"
-            >
-              <Close />
-            </IconButton>
+            <Input
+              classes={{
+                root: classes.search,
+                focused: classes.inputFocused,
+              }}
+              type={"text"}
+              value={search}
+              onChange={handleChange}
+              placeholder="Search"
+              endAdornment={
+                <InputAdornment position="end">
+                  <Search />
+                </InputAdornment>
+              }
+            />
+            <FormControl>
+              <IconButton
+                edge="end"
+                color="inherit"
+                onClick={props.handlePlaylistClose}
+                aria-label="close"
+              >
+                <Close />
+              </IconButton>
+            </FormControl>
           </Toolbar>
         </AppBar>
 
@@ -118,7 +151,16 @@ let Playlist = (props) => {
           <TableBody>
             {props.playlist.tracks.items.map((item) => (
               <TableRow key={item.track.id}>
-                <TableCell>Image</TableCell>
+                <TableCell>
+                  <Avatar
+                    variant="square"
+                    src={
+                      item.track.album.images[0]
+                        ? item.track.album.images[0].url
+                        : null
+                    }
+                  ></Avatar>
+                </TableCell>
                 <TableCell>{item.track.name}</TableCell>
                 <TableCell>
                   {item.track.artists.map((artist) => artist.name).join(", ")}

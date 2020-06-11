@@ -116,6 +116,7 @@ class App extends React.Component {
 
   getUserPlaylists() {
     spotifyWebApi.getUserPlaylists(this.state.user_id).then((response) => {
+      console.log(response);
       this.setState({
         showPlaylists: !this.state.showPlaylists,
         pllibrary: response,

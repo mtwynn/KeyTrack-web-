@@ -2,14 +2,13 @@ import React from "react";
 
 import {
   makeStyles,
-  Button,
   Dialog,
   DialogTitle,
   InputLabel,
   MenuItem,
-  FormHelperText,
   FormControl,
   FormControlLabel,
+  Grid,
   Radio,
   RadioGroup,
   Select,
@@ -22,13 +21,23 @@ const useStyles = makeStyles((theme) => ({
   selectEmpty: {
     marginTop: theme.spacing(1),
   },
+  radioControl: {
+    marginLeft: theme.spacing(1),
+  },
+  radio: {
+    "&$checked": {
+      color: "#1ED760",
+    },
+  },
+  checked: {},
 }));
 
 let KeyCalculator = (props) => {
   const { onClose, open } = props;
-  const [key, setKey] = React.useState("");
-  const [camelot, setCamelot] = React.useState("");
-  const [openKey, setOpenKey] = React.useState("");
+  const [key, setKey] = React.useState(0);
+  const [mode, setMode] = React.useState("major");
+  const [camelot, setCamelot] = React.useState(0);
+  const [openKey, setOpenKey] = React.useState(0);
 
   const classes = useStyles();
 
@@ -37,19 +46,17 @@ let KeyCalculator = (props) => {
   };
 
   const handleChange = (event) => {
-    switch (event.target.name) {
-      case "key":
-        setKey(event.target.value);
-        break;
-      case "camelot":
-        setCamelot(event.target.value);
-        break;
-      case "open":
+    if (event.target.name === "mode") {
+      setMode(event.target.value);
+    } else {
+      setKey(event.target.value);
+      setCamelot(event.target.value);
+      setOpenKey(event.target.value);
     }
   };
 
-  let keyMap = {
-    0: {
+  let keyMap = [
+    {
       key: "C",
       camelot: {
         0: "5A",
@@ -60,7 +67,7 @@ let KeyCalculator = (props) => {
         1: "1d",
       },
     },
-    1: {
+    {
       key: "C#/Db",
       camelot: {
         0: "12A",
@@ -71,7 +78,7 @@ let KeyCalculator = (props) => {
         1: "8d",
       },
     },
-    2: {
+    {
       key: "D",
       camelot: {
         0: "7A",
@@ -82,7 +89,7 @@ let KeyCalculator = (props) => {
         1: "3d",
       },
     },
-    3: {
+    {
       key: "D#/Eb",
       camelot: {
         0: "2A",
@@ -93,7 +100,7 @@ let KeyCalculator = (props) => {
         1: "10d",
       },
     },
-    4: {
+    {
       key: "E",
       camelot: {
         0: "9A",
@@ -104,7 +111,7 @@ let KeyCalculator = (props) => {
         1: "5d",
       },
     },
-    5: {
+    {
       key: "F",
       camelot: {
         0: "4A",
@@ -115,7 +122,7 @@ let KeyCalculator = (props) => {
         1: "12d",
       },
     },
-    6: {
+    {
       key: "F#/Gb",
       camelot: {
         0: "11A",
@@ -126,7 +133,7 @@ let KeyCalculator = (props) => {
         1: "7d",
       },
     },
-    7: {
+    {
       key: "G",
       camelot: {
         0: "6A",
@@ -137,7 +144,7 @@ let KeyCalculator = (props) => {
         1: "2d",
       },
     },
-    8: {
+    {
       key: "G#/Ab",
       camelot: {
         0: "1A",
@@ -148,7 +155,7 @@ let KeyCalculator = (props) => {
         1: "9d",
       },
     },
-    9: {
+    {
       key: "A",
       camelot: {
         0: "8A",
@@ -159,7 +166,7 @@ let KeyCalculator = (props) => {
         1: "4d",
       },
     },
-    10: {
+    {
       key: "A#/Bb",
       camelot: {
         0: "3A",
@@ -170,7 +177,7 @@ let KeyCalculator = (props) => {
         1: "11d",
       },
     },
-    11: {
+    {
       key: "B",
       camelot: {
         0: "10A",
@@ -181,37 +188,93 @@ let KeyCalculator = (props) => {
         1: "6d",
       },
     },
-  };
+  ];
+
+  let musicalKeys = keyMap.map((key, index) => (
+    <MenuItem value={index}>{key.key}</MenuItem>
+  ));
+
+  let minorCamelot = keyMap
+    .map((key, index) => <MenuItem value={index}>{key.camelot[0]}</MenuItem>)
+    .sort(function (a, b) {
+      if (a.props.children.length > b.props.children.length) return 1;
+      if (a.props.children.length < b.props.children.length) return -1;
+      return a.props.children.localeCompare(b.props.children);
+    });
+
+  let majorCamelot = keyMap
+    .map((key, index) => <MenuItem value={index}>{key.camelot[1]}</MenuItem>)
+    .sort(function (a, b) {
+      if (a.props.children.length > b.props.children.length) return 1;
+      if (a.props.children.length < b.props.children.length) return -1;
+      return a.props.children.localeCompare(b.props.children);
+    });
+
+  let minorOpen = keyMap
+    .map((key, index) => <MenuItem value={index}>{key.open[0]}</MenuItem>)
+    .sort(function (a, b) {
+      if (a.props.children.length > b.props.children.length) return 1;
+      if (a.props.children.length < b.props.children.length) return -1;
+      return a.props.children.localeCompare(b.props.children);
+    });
+
+  let majorOpen = keyMap
+    .map((key, index) => <MenuItem value={index}>{key.open[1]}</MenuItem>)
+    .sort(function (a, b) {
+      if (a.props.children.length > b.props.children.length) return 1;
+      if (a.props.children.length < b.props.children.length) return -1;
+      return a.props.children.localeCompare(b.props.children);
+    });
 
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>Key Calculator</DialogTitle>
+      <Grid container spacing={2}>
+        <Grid item>
+          <RadioGroup
+            className={classes.radioControl}
+            value={mode}
+            name="mode"
+            onChange={handleChange}
+          >
+            <Grid container>
+              <Grid item>
+                <FormControlLabel
+                  value="major"
+                  control={
+                    <Radio
+                      classes={{
+                        root: classes.radio,
+                        checked: classes.checked,
+                      }}
+                    />
+                  }
+                  label="Major"
+                />
+              </Grid>
+              <Grid item>
+                <FormControlLabel
+                  value="minor"
+                  control={
+                    <Radio
+                      classes={{
+                        root: classes.radio,
+                        checked: classes.checked,
+                      }}
+                    />
+                  }
+                  label="Minor"
+                />
+              </Grid>
+            </Grid>
+          </RadioGroup>
+        </Grid>
+      </Grid>
+
       <FormControl variant="outlined" className={classes.formControl}>
-        <RadioGroup value="Mode" onChange={handleChange}>
-          <FormControlLabel value="female" control={<Radio />} label="Female" />
-          <FormControlLabel value="male" control={<Radio />} label="Male" />
-          <FormControlLabel value="other" control={<Radio />} label="Other" />
-          <FormControlLabel
-            value="disabled"
-            disabled
-            control={<Radio />}
-            label="(Disabled option)"
-          />
-        </RadioGroup>
         <InputLabel>Key</InputLabel>
         <Select value={key} name="key" onChange={handleChange} label="Key">
-          <MenuItem value={"C"}>C</MenuItem>
-          <MenuItem value={"C#/Db"}>C#/Db</MenuItem>
-          <MenuItem value={"D"}>D</MenuItem>
-          <MenuItem value={"D#/Eb"}>D#/Eb</MenuItem>
-          <MenuItem value={"E"}>E</MenuItem>
-          <MenuItem value={"F"}>F</MenuItem>
-          <MenuItem value={"F#/Gb"}>F#/Gb</MenuItem>
-          <MenuItem value={"G"}>G</MenuItem>
-          <MenuItem value={"G#/Ab"}>G#/Ab</MenuItem>
-          <MenuItem value={"A"}>A</MenuItem>
-          <MenuItem value={"A#/Bb"}>A#/Bb</MenuItem>
-          <MenuItem value={"B"}>B</MenuItem>
+          {musicalKeys}
         </Select>
       </FormControl>
       <FormControl variant="outlined" className={classes.formControl}>
@@ -222,18 +285,18 @@ let KeyCalculator = (props) => {
           onChange={handleChange}
           label="Camelot"
         >
-          <MenuItem value={"1A"}>C</MenuItem>
-          <MenuItem value={"1B"}>C#/Db</MenuItem>
-          <MenuItem value={"2A"}>D</MenuItem>
-          <MenuItem value={"2B"}>D#/Eb</MenuItem>
-          <MenuItem value={"3A"}>E</MenuItem>
-          <MenuItem value={"3B"}>F</MenuItem>
-          <MenuItem value={"4A"}>F#/Gb</MenuItem>
-          <MenuItem value={"4B"}>G</MenuItem>
-          <MenuItem value={"5A"}>G#/Ab</MenuItem>
-          <MenuItem value={"5B"}>A</MenuItem>
-          <MenuItem value={"6A"}>A#/Bb</MenuItem>
-          <MenuItem value={"6B"}>B</MenuItem>
+          {mode === "major" ? majorCamelot : minorCamelot}
+        </Select>
+      </FormControl>
+      <FormControl variant="outlined" className={classes.formControl}>
+        <InputLabel>Open Key</InputLabel>
+        <Select
+          value={openKey}
+          name="open"
+          onChange={handleChange}
+          label="Open Key"
+        >
+          {mode === "major" ? majorOpen : minorOpen}
         </Select>
       </FormControl>
     </Dialog>

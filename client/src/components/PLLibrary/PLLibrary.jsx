@@ -2,6 +2,7 @@ import React from "react";
 import Axios from "axios";
 
 import {
+  Avatar,
   IconButton,
   Table,
   TableBody,
@@ -72,6 +73,7 @@ let PLLibrary = (props) => {
           <TableHead>
             <TableRow>
               <StyledTableCell></StyledTableCell>
+              <StyledTableCell>Cover Art</StyledTableCell>
               <StyledTableCell>Title</StyledTableCell>
               <StyledTableCell>Description</StyledTableCell>
               <StyledTableCell>Owner</StyledTableCell>
@@ -86,9 +88,13 @@ let PLLibrary = (props) => {
                     <MenuOpen />
                   </IconButton>
                 </StyledTableCell>
-                <StyledTableCell component="th" scope="row">
-                  {playlist.name}
+                <StyledTableCell>
+                  <Avatar
+                    variant="square"
+                    src={playlist.images[0].url}
+                  ></Avatar>
                 </StyledTableCell>
+                <StyledTableCell>{playlist.name}</StyledTableCell>
                 <StyledTableCell>{playlist.description}</StyledTableCell>
                 <StyledTableCell>{playlist.owner.display_name}</StyledTableCell>
                 <StyledTableCell>{playlist.tracks.total}</StyledTableCell>
