@@ -22,6 +22,9 @@ import {
 
 import { useTheme } from "@material-ui/core/styles";
 import { Close, Search } from "@material-ui/icons";
+import Spotify from "spotify-web-api-js";
+
+import KeyMap from "../../utils/KeyMap";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -56,45 +59,45 @@ let Playlist = (props) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("lg"));
   const [search, setSearch] = React.useState("");
+  const allItems = props.playlist.tracks.items;
+
+  let [searchItems, setSearchItems] = React.useState(allItems);
 
   let handleChange = (event) => {
+    event.persist();
     setSearch(event.target.value);
+
+    setSearchItems((searchItems) =>
+      allItems.filter((item) => {
+        return String(item.track.name).includes(event.target.value);
+      })
+    );
   };
 
-  const reducer = (allContributors, artist) => [
-    ...allContributors,
-    ...artist.name,
-  ];
+  const spotifyWebApi = new Spotify();
+  spotifyWebApi.setAccessToken(props.token);
 
-  let items = [
-    {
-      id: "ff",
-      name: "First Time",
-      artist: "Seven Lions",
-      musical_key: "B Major",
-      camelot_key: "1B",
-      open_key: "6D",
-      bpm: "150",
-    },
-    {
-      id: "dd",
-      name: "Potions",
-      artist: "Slander",
-      musical_key: "Eb Major",
-      camelot_key: "5B",
-      open_key: "3D",
-      bpm: "150",
-    },
-    {
-      id: "ee",
-      name: "Alive",
-      artist: "Dabin",
-      musical_key: "B Major",
-      camelot_key: "1B",
-      open_key: "6D",
-      bpm: "155",
-    },
-  ];
+  let getKey = (id) => {
+    if (id) {
+      let result = props.playlistKeys.audio_features.find((track) => {
+        if (track !== null) {
+          return id.localeCompare(track.id) === 0;
+        }
+        return null;
+      });
+
+      if (result) {
+        let returnObj = {
+          key: result.key,
+          mode: result.mode,
+          bpm: result.tempo,
+        };
+        return returnObj;
+      } else {
+        return "No Key";
+      }
+    }
+  };
 
   return (
     <div className="m-div">
@@ -143,13 +146,14 @@ let Playlist = (props) => {
               <StyledTableCell>Track</StyledTableCell>
               <StyledTableCell>Artist</StyledTableCell>
               <StyledTableCell>Musical Key</StyledTableCell>
+              <StyledTableCell>Quality</StyledTableCell>
               <StyledTableCell>Camelot Key</StyledTableCell>
               <StyledTableCell>Open Key</StyledTableCell>
               <StyledTableCell>BPM</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.playlist.tracks.items.map((item) => (
+            {searchItems.map((item) => (
               <TableRow key={item.track.id}>
                 <TableCell>
                   <Avatar
@@ -165,10 +169,37 @@ let Playlist = (props) => {
                 <TableCell>
                   {item.track.artists.map((artist) => artist.name).join(", ")}
                 </TableCell>
-                <TableCell>1b</TableCell>
-                <TableCell>1b</TableCell>
-                <TableCell>1b</TableCell>
-                <TableCell>1b</TableCell>
+                <TableCell>
+                  {getKey(item.track.id) || getKey(item.track.id) === 0
+                    ? KeyMap[getKey(item.track.id).key].key
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {getKey(item.track.id) || getKey(item.track.id) === 0
+                    ? getKey(item.track.id).mode === 1
+                      ? "Major"
+                      : "Minor"
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {getKey(item.track.id) || getKey(item.track.id) === 0
+                    ? KeyMap[getKey(item.track.id).key].camelot[
+                        getKey(item.track.id).mode
+                      ]
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {getKey(item.track.id) || getKey(item.track.id) === 0
+                    ? KeyMap[getKey(item.track.id).key].open[
+                        getKey(item.track.id).mode
+                      ]
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {getKey(item.track.id) || getKey(item.track.id) === 0
+                    ? Math.round(getKey(item.track.id).bpm)
+                    : "N/A"}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

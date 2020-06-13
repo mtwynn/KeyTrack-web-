@@ -49,6 +49,7 @@ const StyledTableRow = withStyles((theme) => ({
 let PLLibrary = (props) => {
   const [showPlaylist, setShowPlaylist] = React.useState(false);
   const [currPlaylist, setCurrPlaylist] = React.useState(null);
+  const [playlistKeys, setPlaylistKeys] = React.useState(null);
 
   const spotifyWebApi = new Spotify();
   spotifyWebApi.setAccessToken(props.token);
@@ -57,7 +58,20 @@ let PLLibrary = (props) => {
     spotifyWebApi.getPlaylist(playlist.id, { offset: 100 }).then((response) => {
       console.log(response);
       setCurrPlaylist(response);
-      setShowPlaylist(true);
+
+      let tracks = response.tracks.items;
+
+      let tempArr = [];
+
+      for (var i = 0; i < response.tracks.items.length; ++i) {
+        let id = tracks[i].track.id;
+        tempArr.push(id);
+      }
+      spotifyWebApi.getAudioFeaturesForTracks(tempArr).then((response) => {
+        console.log(response);
+        setPlaylistKeys(response);
+        setShowPlaylist(true);
+      });
     });
   };
 
@@ -110,6 +124,8 @@ let PLLibrary = (props) => {
           handlePlaylistOpen={handlePlaylistOpen}
           handlePlaylistClose={handlePlaylistClose}
           playlist={currPlaylist}
+          playlistKeys={playlistKeys}
+          token={props.token}
         />
       ) : null}
     </>

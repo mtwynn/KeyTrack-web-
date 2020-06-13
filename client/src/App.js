@@ -102,16 +102,22 @@ class App extends React.Component {
 
     console.log("Hash Params: ");
     console.log(hashParams);
+
+    document.cookie = `access_token=${hashParams.access_token}`;
+    document.cookie = `refresh_token=${hashParams.refresh_token}`;
     return hashParams;
 
     // For use in production server
+
     /*
     var urlString = window.location.href;
     var url = new URL(urlString);
     var a_token = new URLSearchParams(url.search).get("access_token");
     var r_token = new URLSearchParams(url.search).get("refresh_token");
-    return { access_token: a_token, refresh_token: r_token };
-    */
+
+    document.cookie = `a_token=${a_token}`;
+    document.cookie = `r_token=${r_token}`;
+    return { access_token: a_token, refresh_token: r_token };*/
   }
 
   getUserPlaylists() {
@@ -180,6 +186,8 @@ class App extends React.Component {
                   color="secondary"
                   onClick={() => {
                     console.log("logging out");
+                    console.log("Cookies: ");
+                    alert(document.cookie);
                   }}
                   disabled={!this.state.loggedIn}
                 >
