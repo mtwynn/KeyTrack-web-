@@ -117,7 +117,8 @@ class App extends React.Component {
 
     document.cookie = `a_token=${a_token}`;
     document.cookie = `r_token=${r_token}`;
-    return { access_token: a_token, refresh_token: r_token };*/
+    return { access_token: a_token, refresh_token: r_token };
+    */
   }
 
   getUserPlaylists() {

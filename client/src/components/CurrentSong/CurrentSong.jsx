@@ -121,8 +121,10 @@ let CurrentSong = (props) => {
       <Card className={classes.root}>
         <CardMedia className={classes.media} image={image} />
         <CardContent>
-          <Typography className={classes.text}>{name}</Typography>
           {loading ? <CircularProgress style={{ color: "white" }} /> : null}
+
+          <Typography className={classes.text}>{name}</Typography>
+
           <Typography variant="h3" className={classes.text}>
             {key}
           </Typography>

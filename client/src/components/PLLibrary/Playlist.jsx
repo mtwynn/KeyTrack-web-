@@ -59,7 +59,7 @@ let Playlist = (props) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("lg"));
   const [search, setSearch] = React.useState("");
-  const allItems = props.playlist.tracks.items;
+  const allItems = props.playlist.items;
 
   let [searchItems, setSearchItems] = React.useState(allItems);
 
@@ -67,9 +67,17 @@ let Playlist = (props) => {
     event.persist();
     setSearch(event.target.value);
 
+    let searchQuery = String(event.target.value).toLowerCase();
     setSearchItems((searchItems) =>
       allItems.filter((item) => {
-        return String(item.track.name).includes(event.target.value);
+        let artists = item.track.artists
+          .map((artist) => artist.name)
+          .join(", ")
+          .toLowerCase();
+
+        let trackName = String(item.track.name).toLowerCase();
+
+        return trackName.includes(searchQuery) || artists.includes(searchQuery);
       })
     );
   };

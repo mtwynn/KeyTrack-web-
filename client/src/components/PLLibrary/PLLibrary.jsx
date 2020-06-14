@@ -55,24 +55,24 @@ let PLLibrary = (props) => {
   spotifyWebApi.setAccessToken(props.token);
 
   let handlePlaylistOpen = (playlist) => {
-    spotifyWebApi.getPlaylist(playlist.id, { offset: 100 }).then((response) => {
-      console.log(response);
-      setCurrPlaylist(response);
+    spotifyWebApi
+      .getPlaylistTracks(playlist.id, { offset: 100 })
+      .then((response) => {
+        setCurrPlaylist(response);
 
-      let tracks = response.tracks.items;
+        let tracks = response.items;
 
-      let tempArr = [];
+        let tempArr = [];
 
-      for (var i = 0; i < response.tracks.items.length; ++i) {
-        let id = tracks[i].track.id;
-        tempArr.push(id);
-      }
-      spotifyWebApi.getAudioFeaturesForTracks(tempArr).then((response) => {
-        console.log(response);
-        setPlaylistKeys(response);
-        setShowPlaylist(true);
+        for (var i = 0; i < response.items.length; ++i) {
+          let id = tracks[i].track.id;
+          tempArr.push(id);
+        }
+        spotifyWebApi.getAudioFeaturesForTracks(tempArr).then((response) => {
+          setPlaylistKeys(response);
+          setShowPlaylist(true);
+        });
       });
-    });
   };
 
   let handlePlaylistClose = () => {
