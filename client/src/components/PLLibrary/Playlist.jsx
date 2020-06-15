@@ -7,6 +7,7 @@ import {
   Dialog,
   Input,
   InputAdornment,
+  Fab,
   FormControl,
   Table,
   TableCell,
@@ -21,14 +22,15 @@ import {
 } from "@material-ui/core";
 
 import { useTheme } from "@material-ui/core/styles";
-import { Close, Search } from "@material-ui/icons";
+import { ArrowUpward, Close, Search } from "@material-ui/icons";
 import Spotify from "spotify-web-api-js";
 
 import KeyMap from "../../utils/KeyMap";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
-    position: "relative",
+    position: "-webkit-sticky",
+    position: "sticky",
     backgroundColor: "#191414",
   },
   title: {
@@ -58,10 +60,12 @@ let Playlist = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("lg"));
-  const [search, setSearch] = React.useState("");
-  const allItems = props.playlist.items;
+  const allItems = props.playlist;
 
+  const [search, setSearch] = React.useState("");
   let [searchItems, setSearchItems] = React.useState(allItems);
+
+  let topRef = React.createRef();
 
   let handleChange = (event) => {
     event.persist();
@@ -87,7 +91,7 @@ let Playlist = (props) => {
 
   let getKey = (id) => {
     if (id) {
-      let result = props.playlistKeys.audio_features.find((track) => {
+      let result = props.playlistKeys.find((track) => {
         if (track !== null) {
           return id.localeCompare(track.id) === 0;
         }
@@ -117,7 +121,7 @@ let Playlist = (props) => {
         <AppBar className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
-              {props.playlist.name}
+              {props.playlistName}
             </Typography>
             <Input
               classes={{
@@ -148,7 +152,7 @@ let Playlist = (props) => {
         </AppBar>
 
         <Table>
-          <TableHead>
+          <TableHead ref={topRef}>
             <TableRow>
               <StyledTableCell>Image</StyledTableCell>
               <StyledTableCell>Track</StyledTableCell>
@@ -212,6 +216,23 @@ let Playlist = (props) => {
             ))}
           </TableBody>
         </Table>
+        <Fab
+          variant="extended"
+          style={{
+            backgroundColor: "#1ED760",
+            color: "#FFF",
+            borderRadius: "0",
+          }}
+          onClick={() => {
+            topRef.current.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }}
+        >
+          <ArrowUpward />
+          Back To Top
+        </Fab>
       </Dialog>
     </div>
   );

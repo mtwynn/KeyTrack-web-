@@ -4,6 +4,9 @@ import Axios from "axios";
 import {
   Avatar,
   IconButton,
+  CircularProgress,
+  Dialog,
+  LinearProgress,
   Table,
   TableBody,
   TableCell,
@@ -36,6 +39,17 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "inline-block",
   },
+  loadingDialog: {
+    backgroundColor: "transparent",
+  },
+  loadingDialogPaper: {
+    backgroundColor: "transparent",
+    boxShadow: "none",
+    overflow: "hidden",
+  },
+  colorPrimary: {
+    color: "#1ED760",
+  },
 }));
 
 const StyledTableRow = withStyles((theme) => ({
@@ -47,32 +61,62 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 
 let PLLibrary = (props) => {
+  const [loadingPlaylist, setLoadingPlaylist] = React.useState(false);
   const [showPlaylist, setShowPlaylist] = React.useState(false);
   const [currPlaylist, setCurrPlaylist] = React.useState(null);
   const [playlistKeys, setPlaylistKeys] = React.useState(null);
+  const [playlistName, setPlaylistName] = React.useState("");
 
   const spotifyWebApi = new Spotify();
   spotifyWebApi.setAccessToken(props.token);
 
   let handlePlaylistOpen = (playlist) => {
-    spotifyWebApi
-      .getPlaylistTracks(playlist.id, { offset: 100 })
-      .then((response) => {
-        setCurrPlaylist(response);
+    let numRequests = Math.ceil(playlist.tracks.total / 100);
+    let playlistPromises = [];
+    let audioFeaturesPromises = [];
 
-        let tracks = response.items;
+    setLoadingPlaylist(true);
 
-        let tempArr = [];
+    setPlaylistName(playlist.name);
 
-        for (var i = 0; i < response.items.length; ++i) {
-          let id = tracks[i].track.id;
-          tempArr.push(id);
+    for (var i = 0; i < numRequests; ++i) {
+      playlistPromises.push(
+        spotifyWebApi.getPlaylistTracks(playlist.id, { offset: i * 100 })
+      );
+    }
+
+    Promise.all(playlistPromises).then((results) => {
+      let tempArr = [];
+
+      results.forEach((result) => {
+        tempArr = tempArr.concat(result.items);
+
+        let playlistItems = result.items;
+        let playlistItemIds = [];
+
+        for (var j = 0; j < playlistItems.length; ++j) {
+          let id = playlistItems[j].track.id;
+          playlistItemIds.push(id);
         }
-        spotifyWebApi.getAudioFeaturesForTracks(tempArr).then((response) => {
-          setPlaylistKeys(response);
-          setShowPlaylist(true);
-        });
+
+        audioFeaturesPromises.push(
+          spotifyWebApi.getAudioFeaturesForTracks(playlistItemIds)
+        );
       });
+
+      Promise.all(audioFeaturesPromises).then((results) => {
+        let keysArr = [];
+
+        results.forEach((result) => {
+          keysArr = keysArr.concat(result.audio_features);
+        });
+
+        setCurrPlaylist(tempArr);
+        setPlaylistKeys(keysArr);
+        setShowPlaylist(true);
+        setLoadingPlaylist(false);
+      });
+    });
   };
 
   let handlePlaylistClose = () => {
@@ -82,6 +126,21 @@ let PLLibrary = (props) => {
 
   return (
     <>
+      <Dialog
+        open={loadingPlaylist}
+        PaperProps={{
+          classes: {
+            root: classes.loadingDialogPaper,
+          },
+        }}
+      >
+        <CircularProgress
+          classes={{ colorPrimary: classes.colorPrimary }}
+          size={100}
+          variant="indeterminate"
+          disableShrink
+        />
+      </Dialog>
       <TableContainer component={Paper} className={classes.root}>
         <Table className={classes.table} aria-label="customized table">
           <TableHead>
@@ -96,23 +155,27 @@ let PLLibrary = (props) => {
           </TableHead>
           <TableBody>
             {props.pllibrary.items.map((playlist) => (
-              <StyledTableRow key={playlist.id}>
-                <StyledTableCell>
-                  <IconButton onClick={() => handlePlaylistOpen(playlist)}>
-                    <MenuOpen />
-                  </IconButton>
-                </StyledTableCell>
-                <StyledTableCell>
-                  <Avatar
-                    variant="square"
-                    src={playlist.images[0].url}
-                  ></Avatar>
-                </StyledTableCell>
-                <StyledTableCell>{playlist.name}</StyledTableCell>
-                <StyledTableCell>{playlist.description}</StyledTableCell>
-                <StyledTableCell>{playlist.owner.display_name}</StyledTableCell>
-                <StyledTableCell>{playlist.tracks.total}</StyledTableCell>
-              </StyledTableRow>
+              <>
+                <StyledTableRow key={playlist.id}>
+                  <StyledTableCell>
+                    <IconButton onClick={() => handlePlaylistOpen(playlist)}>
+                      <MenuOpen />
+                    </IconButton>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    <Avatar
+                      variant="square"
+                      src={playlist.images[0].url}
+                    ></Avatar>
+                  </StyledTableCell>
+                  <StyledTableCell>{playlist.name}</StyledTableCell>
+                  <StyledTableCell>{playlist.description}</StyledTableCell>
+                  <StyledTableCell>
+                    {playlist.owner.display_name}
+                  </StyledTableCell>
+                  <StyledTableCell>{playlist.tracks.total}</StyledTableCell>
+                </StyledTableRow>
+              </>
             ))}
           </TableBody>
         </Table>
@@ -123,6 +186,7 @@ let PLLibrary = (props) => {
           open={showPlaylist}
           handlePlaylistOpen={handlePlaylistOpen}
           handlePlaylistClose={handlePlaylistClose}
+          playlistName={playlistName}
           playlist={currPlaylist}
           playlistKeys={playlistKeys}
           token={props.token}
