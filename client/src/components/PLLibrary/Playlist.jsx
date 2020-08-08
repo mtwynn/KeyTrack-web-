@@ -177,10 +177,13 @@ let Playlist = (props) => {
 
               let aCamelot = KeyMap[aKey.key].camelot[aKey.mode];
               let bCamelot = KeyMap[bKey.key].camelot[bKey.mode];
-
-              console.log(aCamelot + " and " + bCamelot);
+              let aBPM = aKey.bpm;
+              let bBPM = bKey.bpm;
               
-              return aCamelot.localeCompare(bCamelot);
+              if (aCamelot.localeCompare(bCamelot) < 0) return -1;
+              if (aCamelot.localeCompare(bCamelot) > 0) return 1;
+              return aBPM - bBPM;
+
             }).map((item) => (
               <TableRow key={item.track.id}>
                 <TableCell>
