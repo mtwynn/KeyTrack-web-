@@ -111,6 +111,8 @@ let Playlist = (props) => {
     }
   };
 
+  
+
   return (
     <div className="m-div">
       <Dialog
@@ -165,7 +167,21 @@ let Playlist = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {searchItems.map((item) => (
+            {searchItems.sort((a, b) => {
+              let aKey = getKey(a.track.id);
+              let bKey = getKey(b.track.id);
+
+              if (!aKey) return -1; 
+              if (!bKey) return 1;
+              if (!aKey && !bKey) return 0;
+
+              let aCamelot = KeyMap[aKey.key].camelot[aKey.mode];
+              let bCamelot = KeyMap[bKey.key].camelot[bKey.mode];
+
+              console.log(aCamelot + " and " + bCamelot);
+              
+              return aCamelot.localeCompare(bCamelot);
+            }).map((item) => (
               <TableRow key={item.track.id}>
                 <TableCell>
                   <Avatar
