@@ -92,7 +92,7 @@ let Playlist = (props) => {
   let getKey = (id) => {
     if (id) {
       let result = props.playlistKeys.find((track) => {
-        if (track !== null) {
+        if (track) {
           return id.localeCompare(track.id) === 0;
         }
         return null;
@@ -106,12 +106,10 @@ let Playlist = (props) => {
         };
         return returnObj;
       } else {
-        return "No Key";
+        return null;
       }
     }
   };
-
-  
 
   return (
     <div className="m-div">
@@ -167,72 +165,73 @@ let Playlist = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {searchItems.sort((a, b) => {
-              let aKey = getKey(a.track.id);
-              let bKey = getKey(b.track.id);
+            {searchItems
+              .sort((a, b) => {
+                let aKey = getKey(a.track.id);
+                let bKey = getKey(b.track.id);
 
-              if (!aKey) return -1; 
-              if (!bKey) return 1;
-              if (!aKey && !bKey) return 0;
+                if (!aKey) return -1;
+                if (!bKey) return 1;
+                if (!aKey && !bKey) return 0;
 
-              let aCamelot = KeyMap[aKey.key].camelot[aKey.mode];
-              let bCamelot = KeyMap[bKey.key].camelot[bKey.mode];
-              let aBPM = aKey.bpm;
-              let bBPM = bKey.bpm;
-              
-              if (aCamelot.localeCompare(bCamelot) < 0) return -1;
-              if (aCamelot.localeCompare(bCamelot) > 0) return 1;
-              return aBPM - bBPM;
+                let aCamelot = KeyMap[aKey.key].camelot[aKey.mode];
+                let bCamelot = KeyMap[bKey.key].camelot[bKey.mode];
+                let aBPM = aKey.bpm;
+                let bBPM = bKey.bpm;
 
-            }).map((item) => (
-              <TableRow key={item.track.id}>
-                <TableCell>
-                  <Avatar
-                    variant="square"
-                    src={
-                      item.track.album.images[0]
-                        ? item.track.album.images[0].url
-                        : null
-                    }
-                  ></Avatar>
-                </TableCell>
-                <TableCell>{item.track.name}</TableCell>
-                <TableCell>
-                  {item.track.artists.map((artist) => artist.name).join(", ")}
-                </TableCell>
-                <TableCell>
-                  {getKey(item.track.id) || getKey(item.track.id) === 0
-                    ? KeyMap[getKey(item.track.id).key].key
-                    : "N/A"}
-                </TableCell>
-                <TableCell>
-                  {getKey(item.track.id) || getKey(item.track.id) === 0
-                    ? getKey(item.track.id).mode === 1
-                      ? "Major"
-                      : "Minor"
-                    : "N/A"}
-                </TableCell>
-                <TableCell>
-                  {getKey(item.track.id) || getKey(item.track.id) === 0
-                    ? KeyMap[getKey(item.track.id).key].camelot[
-                        getKey(item.track.id).mode
-                      ]
-                    : "N/A"}
-                </TableCell>
-                <TableCell>
-                  {getKey(item.track.id) || getKey(item.track.id) === 0
-                    ? KeyMap[getKey(item.track.id).key].open[
-                        getKey(item.track.id).mode
-                      ]
-                    : "N/A"}
-                </TableCell>
-                <TableCell>
-                  {getKey(item.track.id) || getKey(item.track.id) === 0
-                    ? Math.round(getKey(item.track.id).bpm)
-                    : "N/A"}
-                </TableCell>
-              </TableRow>
-            ))}
+                if (aCamelot.localeCompare(bCamelot) < 0) return -1;
+                if (aCamelot.localeCompare(bCamelot) > 0) return 1;
+                return aBPM - bBPM;
+              })
+              .map((item) => (
+                <TableRow key={item.track.id}>
+                  <TableCell>
+                    <Avatar
+                      variant="square"
+                      src={
+                        item.track.album.images[0]
+                          ? item.track.album.images[0].url
+                          : null
+                      }
+                    ></Avatar>
+                  </TableCell>
+                  <TableCell>{item.track.name}</TableCell>
+                  <TableCell>
+                    {item.track.artists.map((artist) => artist.name).join(", ")}
+                  </TableCell>
+                  <TableCell>
+                    {getKey(item.track.id) || getKey(item.track.id) === 0
+                      ? KeyMap[getKey(item.track.id).key].key
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {getKey(item.track.id) || getKey(item.track.id) === 0
+                      ? getKey(item.track.id).mode === 1
+                        ? "Major"
+                        : "Minor"
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {getKey(item.track.id) || getKey(item.track.id) === 0
+                      ? KeyMap[getKey(item.track.id).key].camelot[
+                          getKey(item.track.id).mode
+                        ]
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {getKey(item.track.id) || getKey(item.track.id) === 0
+                      ? KeyMap[getKey(item.track.id).key].open[
+                          getKey(item.track.id).mode
+                        ]
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {getKey(item.track.id) || getKey(item.track.id) === 0
+                      ? Math.round(getKey(item.track.id).bpm)
+                      : "N/A"}
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
         <Fab
