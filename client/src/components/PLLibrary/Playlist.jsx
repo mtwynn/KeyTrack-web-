@@ -24,6 +24,7 @@ import {
 import { useTheme } from "@material-ui/core/styles";
 import { ArrowUpward, Close, Search } from "@material-ui/icons";
 import Spotify from "spotify-web-api-js";
+import SpotifyPlayer from "react-spotify-web-playback";
 
 import KeyMap from "../../utils/KeyMap";
 
@@ -64,6 +65,8 @@ let Playlist = (props) => {
 
   const [search, setSearch] = React.useState("");
   let [searchItems, setSearchItems] = React.useState(allItems);
+  let [uris, setUris] = React.useState([]);
+  let [isPlaying, setIsPlaying] = React.useState(false);
 
   let topRef = React.createRef();
 
@@ -84,6 +87,13 @@ let Playlist = (props) => {
         return trackName.includes(searchQuery) || artists.includes(searchQuery);
       })
     );
+  };
+
+  let handleRowClick = (event, item) => {
+    let uri = item.track.uri;
+    setUris([uri]);
+
+    setIsPlaying(true);
   };
 
   const spotifyWebApi = new Spotify();
@@ -184,7 +194,12 @@ let Playlist = (props) => {
                 return aBPM - bBPM;
               })
               .map((item) => (
-                <TableRow key={item.track.id}>
+                <TableRow
+                  key={item.track.id}
+                  hover
+                  style={{ cursor: "pointer" }}
+                  onClick={(event) => handleRowClick(event, item)}
+                >
                   <TableCell>
                     <Avatar
                       variant="square"
@@ -251,6 +266,19 @@ let Playlist = (props) => {
           <ArrowUpward />
           Back To Top
         </Fab>
+        <div style={{ position: "fixed", bottom: 0, width: "100vw" }}>
+          <SpotifyPlayer
+            token={spotifyWebApi.getAccessToken()}
+            uris={uris}
+            styles={{
+              activeColor: "#1ED760",
+              loaderColor: "#1ED760",
+              sliderColor: "#1ED760",
+            }}
+            play={isPlaying}
+            showSaveIcon={true}
+          />
+        </div>
       </Dialog>
     </div>
   );

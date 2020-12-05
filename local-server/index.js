@@ -16,13 +16,13 @@ var cookieParser = require("cookie-parser");
 var path = require("path");
 
 var fs = require("fs");
-let rawdata = fs.readFileSync(
-  path.resolve(__dirname, "..", "../credentials.json")
-);
-let credentials = JSON.parse(rawdata);
+// let rawdata = fs.readFileSync(
+//   path.resolve(__dirname, "..", "../credentials.json")
+// );
+// let credentials = JSON.parse(rawdata);
 
-var client_id = credentials.id; // Your client id
-var client_secret = credentials.secret; // Your secret
+var client_id = "4cabe598958142399457b951af868b7d"; // Your client id
+var client_secret = "8ac88eb80202410e89a4642bbcc8ba63"; // Your secret
 var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
 //var redirect_uri = "https://keytrack.herokuapp.com/callback/";
 
@@ -57,7 +57,7 @@ app.get("/login", function (req, res) {
 
   // your application requests authorization
   var scope =
-    "user-read-private user-read-email user-read-playback-state playlist-read-private";
+    "streaming user-read-private user-read-email user-read-playback-state user-modify-playback-state user-library-read user-library-modify playlist-read-private playlist-read-collaborative";
   res.redirect(
     "https://accounts.spotify.com/authorize?" +
       querystring.stringify({

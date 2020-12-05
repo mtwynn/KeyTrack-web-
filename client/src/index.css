@@ -12,6 +12,14 @@ code {
     monospace;
 }
 
+.rrs__range {
+  background-color: "#1ED760" !important;
+}
+
+.rrs__track {
+  background-color: "#CCCCCC" !important;
+}
+
 @keyframes float {
   0% {
     box-shadow: 0 3px 11px 0px rgba(0, 0, 0, 0.6);

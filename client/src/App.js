@@ -73,6 +73,7 @@ class App extends React.Component {
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
     this.openKeyCalculator = this.openKeyCalculator.bind(this);
 
+    console.log(process.env);
     if (params.access_token) {
       console.log("Access token accepted");
       spotifyWebApi.setAccessToken(params.access_token);
@@ -141,7 +142,7 @@ class App extends React.Component {
     return (
       <div className="App m-div">
         <FadeIn transitionDuration={1000}>
-          <a href={localServer}>
+          <a href={prodServer}>
             <GreenButton
               variant="contained"
               color="primary"
