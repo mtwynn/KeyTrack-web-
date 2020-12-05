@@ -16,13 +16,13 @@ var cookieParser = require("cookie-parser");
 var path = require("path");
 
 var fs = require("fs");
-// let rawdata = fs.readFileSync(
-//   path.resolve(__dirname, "..", "../credentials.json")
-// );
-// let credentials = JSON.parse(rawdata);
+let rawdata = fs.readFileSync(
+  path.resolve(__dirname, "..", "../credentials.json")
+);
+let credentials = JSON.parse(rawdata);
 
-var client_id = "4cabe598958142399457b951af868b7d"; // Your client id
-var client_secret = "8ac88eb80202410e89a4642bbcc8ba63"; // Your secret
+var client_id = credentials.id; // Your client id
+var client_secret = credentials.seecret; // Your secret
 var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
 //var redirect_uri = "https://keytrack.herokuapp.com/callback/";
 
