@@ -93,24 +93,25 @@ class App extends React.Component {
   }
 
   getHashParams() {
-    var hashParams = {};
-    var e,
-      r = /([^&;=]+)=?([^&;]*)/g,
-      q = window.location.hash.substring(1);
-    while ((e = r.exec(q))) {
-      hashParams[e[1]] = decodeURIComponent(e[2]);
-    }
+    // For use in local server
+    // var hashParams = {};
+    // var e,
+    //   r = /([^&;=]+)=?([^&;]*)/g,
+    //   q = window.location.hash.substring(1);
+    // while ((e = r.exec(q))) {
+    //   hashParams[e[1]] = decodeURIComponent(e[2]);
+    // }
 
-    console.log("Hash Params: ");
-    console.log(hashParams);
+    // console.log("Hash Params: ");
+    // console.log(hashParams);
 
-    document.cookie = `access_token=${hashParams.access_token}`;
-    document.cookie = `refresh_token=${hashParams.refresh_token}`;
-    return hashParams;
+    // document.cookie = `access_token=${hashParams.access_token}`;
+    // document.cookie = `refresh_token=${hashParams.refresh_token}`;
+    // return hashParams;
 
     // For use in production server
 
-    /*
+    
     var urlString = window.location.href;
     var url = new URL(urlString);
     var a_token = new URLSearchParams(url.search).get("access_token");
@@ -119,7 +120,7 @@ class App extends React.Component {
     document.cookie = `a_token=${a_token}`;
     document.cookie = `r_token=${r_token}`;
     return { access_token: a_token, refresh_token: r_token };
-    */
+    
   }
 
   getUserPlaylists() {
