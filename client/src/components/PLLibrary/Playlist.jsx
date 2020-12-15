@@ -60,7 +60,7 @@ const StyledTableCell = withStyles((theme) => ({
 let Playlist = (props) => {
   const classes = useStyles();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("lg"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down("xl"));
   const allItems = props.playlist;
 
   const [search, setSearch] = React.useState("");
