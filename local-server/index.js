@@ -13,16 +13,9 @@ var cors = require("cors");
 var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
 
-var path = require("path");
-
-var fs = require("fs");
-let rawdata = fs.readFileSync(
-  path.resolve(__dirname, "..", "../credentials.json")
-);
-let credentials = JSON.parse(rawdata)["credentials"];
+var credentials = require("../credentials.js");
 
 var client_id = credentials.id; // Your client id
-console.log(client_id);
 var client_secret = credentials.secret; // Your secret
 var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
 //var redirect_uri = "https://keytrack.herokuapp.com/callback/";

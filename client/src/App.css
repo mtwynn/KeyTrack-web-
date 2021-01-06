@@ -55,3 +55,21 @@ img {
 .current-song {
   text-align: center;
 }
+
+.changelog {
+  position: absolute !important;
+  bottom: 1rem !important;
+  left: 1rem !important;
+  font-weight: bold;
+}
+
+.changelog-entry-header {
+  color: black;
+}
+
+.version-label {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-weight: bold;
+}

@@ -3,14 +3,27 @@ import "./App.css";
 
 import Spotify from "spotify-web-api-js";
 import {
-  Grid,
   Button,
+  Chip,
+  Grid,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Typography,
   makeStyles,
   withStyles,
 } from "@material-ui/core";
+
+import { Build, Receipt, SettingsApplications } from "@material-ui/icons";
 import FadeIn from "react-fade-in";
 
+import changelog from "./changelog.js";
 import CurrentSong from "./components/CurrentSong/CurrentSong";
 import PLLibrary from "./components/PLLibrary/PLLibrary";
 import KeyCalculator from "./utils/KeyCalculator";
@@ -68,6 +81,7 @@ class App extends React.Component {
       showPlaylists: false,
       showKeyCalculator: false,
       pllibrary: null,
+      openChangelog: false,
     };
 
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
@@ -111,7 +125,6 @@ class App extends React.Component {
 
     // For use in production server
 
-    
     var urlString = window.location.href;
     var url = new URL(urlString);
     var a_token = new URLSearchParams(url.search).get("access_token");
@@ -120,7 +133,6 @@ class App extends React.Component {
     document.cookie = `a_token=${a_token}`;
     document.cookie = `r_token=${r_token}`;
     return { access_token: a_token, refresh_token: r_token };
-    
   }
 
   getUserPlaylists() {
@@ -136,6 +148,12 @@ class App extends React.Component {
   openKeyCalculator() {
     this.setState({
       showKeyCalculator: !this.state.showKeyCalculator,
+    });
+  }
+
+  handleCloseChangelog() {
+    this.setState({
+      openChangelog: false,
     });
   }
 
@@ -225,6 +243,72 @@ class App extends React.Component {
             <Typography variant="caption">Made by Tam Nguyen</Typography>
           </div>
         </FadeIn>
+
+        <Dialog
+          fullWidth={true}
+          maxWidth="md"
+          open={this.state.openChangelog}
+          onClose={this.handleCloseChangelog.bind(this)}
+        >
+          <DialogTitle>Changelog</DialogTitle>
+          <DialogContent>
+            {changelog.map((entry) => {
+              return (
+                <DialogContentText>
+                  <div>
+                    <Typography className="changelog-entry-header" variant="h6">
+                      v{entry.version}
+                    </Typography>
+                    <Typography
+                      className="changelog-entry-header"
+                      variant="button"
+                    >
+                      {entry.date}
+                    </Typography>
+                  </div>
+                  <List dense={true}>
+                    {entry.changes.map((element) => {
+                      return (
+                        <ListItem>
+                          <ListItemIcon>
+                            {element.type === "bugfix" ? (
+                              <Build />
+                            ) : (
+                              <SettingsApplications />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText primary={element.desc} />
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </DialogContentText>
+              );
+            })}
+          </DialogContent>
+
+          <DialogActions>
+            <Button
+              onClick={this.handleCloseChangelog.bind(this)}
+              color="primary"
+            >
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Chip label="v1.0.5" className="version-label" />
+
+        <Chip
+          className="changelog"
+          icon={<Receipt />}
+          label="Changelog"
+          onClick={() => {
+            this.setState({
+              openChangelog: true,
+            });
+          }}
+        />
       </div>
     );
   }
