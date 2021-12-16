@@ -1,7 +1,21 @@
 const changelog = [
   {
+    version: "1.0.7",
+    date: "12/15/21",
+    changes: [
+      {
+        type: "feature",
+        desc: "Added filtering by key, quality, and BPM to Playlist",
+      },
+      {
+        type: "bugfix",
+        desc: "Fixed positioning of changelog and version chips",
+      },
+    ],
+  },
+  {
     version: "1.0.6",
-    date: "01/05/20",
+    date: "01/05/21",
     changes: [
       {
         type: "feature",

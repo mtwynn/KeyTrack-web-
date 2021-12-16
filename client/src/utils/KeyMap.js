@@ -11,7 +11,7 @@ let KeyMap = [
     },
   },
   {
-    key: "C#/Db",
+    key: "C♯/D♭",
     camelot: {
       0: "12A",
       1: "3B",
@@ -33,7 +33,7 @@ let KeyMap = [
     },
   },
   {
-    key: "D#/Eb",
+    key: "D♯/E♭",
     camelot: {
       0: "2A",
       1: "5B",
@@ -66,7 +66,7 @@ let KeyMap = [
     },
   },
   {
-    key: "F#/Gb",
+    key: "F♯/G♭",
     camelot: {
       0: "11A",
       1: "2B",
@@ -88,7 +88,7 @@ let KeyMap = [
     },
   },
   {
-    key: "G#/Ab",
+    key: "G♯/A♭",
     camelot: {
       0: "1A",
       1: "4B",
@@ -110,7 +110,7 @@ let KeyMap = [
     },
   },
   {
-    key: "A#/Bb",
+    key: "A♯/B♭",
     camelot: {
       0: "3A",
       1: "6B",

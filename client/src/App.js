@@ -32,8 +32,9 @@ import Axios from "axios";
 
 const spotifyWebApi = new Spotify();
 
-let prodServer = "https://keytrack.herokuapp.com/";
-let localServer = "http://localhost:8888/";
+let isProduction = process.env.NODE_ENV === 'production';
+
+let server = isProduction ? "https://keytrack.herokuapp.com/" : "http://localhost:8888/";
 
 const GreenButton = withStyles((theme) => ({
   root: {
@@ -87,7 +88,6 @@ class App extends React.Component {
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
     this.openKeyCalculator = this.openKeyCalculator.bind(this);
 
-    console.log(process.env);
     if (params.access_token) {
       console.log("Access token accepted");
       spotifyWebApi.setAccessToken(params.access_token);
@@ -107,42 +107,42 @@ class App extends React.Component {
   }
 
   getHashParams() {
-    // For use in local server
-    // var hashParams = {};
-    // var e,
-    //   r = /([^&;=]+)=?([^&;]*)/g,
-    //   q = window.location.hash.substring(1);
-    // while ((e = r.exec(q))) {
-    //   hashParams[e[1]] = decodeURIComponent(e[2]);
-    // }
-
-    // console.log("Hash Params: ");
-    // console.log(hashParams);
-
-    // document.cookie = `access_token=${hashParams.access_token}`;
-    // document.cookie = `refresh_token=${hashParams.refresh_token}`;
-    // return hashParams;
-
-    // For use in production server
-
-    var urlString = window.location.href;
-    var url = new URL(urlString);
-    var a_token = new URLSearchParams(url.search).get("access_token");
-    var r_token = new URLSearchParams(url.search).get("refresh_token");
-
-    document.cookie = `a_token=${a_token}`;
-    document.cookie = `r_token=${r_token}`;
-    return { access_token: a_token, refresh_token: r_token };
+    let hashParams = {};
+    if (isProduction) {
+      // For use in production server
+      var urlString = window.location.href;
+      var url = new URL(urlString);
+      var a_token = new URLSearchParams(url.search).get("access_token");
+      var r_token = new URLSearchParams(url.search).get("refresh_token");
+  
+      document.cookie = `a_token=${a_token}`;
+      document.cookie = `r_token=${r_token}`;
+      hashParams = { access_token: a_token, refresh_token: r_token };
+    } else {
+      // For use in local server
+      var e,
+        r = /([^&;=]+)=?([^&;]*)/g,
+        q = window.location.hash.substring(1);
+      while ((e = r.exec(q))) {
+        hashParams[e[1]] = decodeURIComponent(e[2]);
+      }
+  
+      document.cookie = `access_token=${hashParams.access_token}`;
+      document.cookie = `refresh_token=${hashParams.refresh_token}`;
+    }
+    return hashParams;
   }
 
   getUserPlaylists() {
-    spotifyWebApi.getUserPlaylists(this.state.user_id, { limit: 50 }).then((response) => {
-      console.log(response);
-      this.setState({
-        showPlaylists: !this.state.showPlaylists,
-        pllibrary: response,
+    spotifyWebApi
+      .getUserPlaylists(this.state.user_id, { limit: 50 })
+      .then((response) => {
+        console.log(response);
+        this.setState({
+          showPlaylists: !this.state.showPlaylists,
+          pllibrary: response,
+        });
       });
-    });
   }
 
   openKeyCalculator() {
@@ -161,7 +161,7 @@ class App extends React.Component {
     return (
       <div className="App m-div">
         <FadeIn transitionDuration={1000}>
-          <a href={prodServer}>
+          <a href={server}>
             <GreenButton
               variant="contained"
               color="primary"
@@ -242,8 +242,40 @@ class App extends React.Component {
           <div className="m-div">
             <Typography variant="caption">Made by Tam Nguyen</Typography>
           </div>
+          {this.state.showPlaylists && (
+            <>
+              <Chip label="v1.0.5" className="version-label" />
+
+              <Chip
+                className="changelog"
+                icon={<Receipt />}
+                label="Changelog"
+                onClick={() => {
+                  this.setState({
+                    openChangelog: true,
+                  });
+                }}
+              />
+            </>
+          )}
         </FadeIn>
 
+        {!this.state.showPlaylists && (
+            <>
+              <Chip label="v1.0.7" className="version-label" />
+
+              <Chip
+                className="changelog"
+                icon={<Receipt />}
+                label="Changelog"
+                onClick={() => {
+                  this.setState({
+                    openChangelog: true,
+                  });
+                }}
+              />
+            </>
+          )}
         <Dialog
           fullWidth={true}
           maxWidth="md"
@@ -254,7 +286,7 @@ class App extends React.Component {
           <DialogContent>
             {changelog.map((entry) => {
               return (
-                <DialogContentText>
+                <DialogContentText key={entry.version}>
                   <div>
                     <Typography className="changelog-entry-header" variant="h6">
                       v{entry.version}
@@ -296,19 +328,6 @@ class App extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
-
-        <Chip label="v1.0.5" className="version-label" />
-
-        <Chip
-          className="changelog"
-          icon={<Receipt />}
-          label="Changelog"
-          onClick={() => {
-            this.setState({
-              openChangelog: true,
-            });
-          }}
-        />
       </div>
     );
   }
