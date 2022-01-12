@@ -20,6 +20,12 @@ var client_secret = credentials.secret; // Your secret
 var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
 //var redirect_uri = "https://keytrack.herokuapp.com/callback/";
 
+// Soundcloud Stuff
+// SC.initialize({
+//   client_id: "cKf4vDOFJQhksTD5LHptv0uG9P0gHZA0",
+//   redirect_uri: "CALLBACK_URL",
+// });
+
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
