@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import Axios from "axios";
 
 import {
@@ -155,7 +155,7 @@ let PLLibrary = (props) => {
           </TableHead>
           <TableBody>
             {props.pllibrary.items.map((playlist) => (
-              <>
+              <Fragment key={playlist.id}>
                 <StyledTableRow key={playlist.id}>
                   <StyledTableCell>
                     <IconButton onClick={() => handlePlaylistOpen(playlist)}>
@@ -175,7 +175,7 @@ let PLLibrary = (props) => {
                   </StyledTableCell>
                   <StyledTableCell>{playlist.tracks.total}</StyledTableCell>
                 </StyledTableRow>
-              </>
+              </Fragment>
             ))}
           </TableBody>
         </Table>

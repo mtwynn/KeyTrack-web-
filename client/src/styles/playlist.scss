@@ -1,0 +1,20 @@
+// Search Bar
+
+.MuiInput-underline:before {
+  border-bottom: 2px solid #333 !important
+}
+
+.MuiInput-underline:after {
+  border-bottom: 2px solid #ddd !important
+}
+
+// Filters
+
+.MuiFormLabel-root {
+  color: #999 !important;
+}
+
+.MuiFormLabel-root.Mui-focused {
+  color: #fff !important;
+}
+
