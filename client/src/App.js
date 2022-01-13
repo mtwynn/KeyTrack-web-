@@ -30,11 +30,20 @@ import KeyCalculator from "./utils/KeyCalculator";
 
 import Axios from "axios";
 
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { firebaseConfig } from "../src/config/firebaseConfig";
+
 const spotifyWebApi = new Spotify();
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore();
 
-let isProduction = process.env.NODE_ENV === 'production';
+let isProduction = process.env.NODE_ENV === "production";
 
-let server = isProduction ? "https://keytrack.herokuapp.com/" : "http://localhost:8888/";
+let server = isProduction
+  ? "https://keytrack.herokuapp.com/"
+  : "http://localhost:8888/";
 
 const GreenButton = withStyles((theme) => ({
   root: {
@@ -114,7 +123,7 @@ class App extends React.Component {
       var url = new URL(urlString);
       var a_token = new URLSearchParams(url.search).get("access_token");
       var r_token = new URLSearchParams(url.search).get("refresh_token");
-  
+
       document.cookie = `a_token=${a_token}`;
       document.cookie = `r_token=${r_token}`;
       hashParams = { access_token: a_token, refresh_token: r_token };
@@ -126,7 +135,7 @@ class App extends React.Component {
       while ((e = r.exec(q))) {
         hashParams[e[1]] = decodeURIComponent(e[2]);
       }
-  
+
       document.cookie = `access_token=${hashParams.access_token}`;
       document.cookie = `refresh_token=${hashParams.refresh_token}`;
     }
@@ -158,6 +167,22 @@ class App extends React.Component {
   }
 
   render() {
+    let self = this;
+    if (self.state.user_id) {
+      (async function () {
+        console.log(self.state.user_id);
+        const docRef = doc(db, "Users", self.state.user_id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          console.log("Document data:", docSnap.data());
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
+      })();
+    }
+
     return (
       <div className="App m-div">
         <FadeIn transitionDuration={1000}>
@@ -170,6 +195,7 @@ class App extends React.Component {
                   ? null
                   : { animation: "float 1s ease-in-out infinite" }
               }
+              disabled={!this.state.loggedIn}
             >
               Login with Spotify
             </GreenButton>
@@ -261,21 +287,21 @@ class App extends React.Component {
         </FadeIn>
 
         {!this.state.showPlaylists && (
-            <>
-              <Chip label="v1.0.7" className="version-label" />
+          <>
+            <Chip label="v1.0.7" className="version-label" />
 
-              <Chip
-                className="changelog"
-                icon={<Receipt />}
-                label="Changelog"
-                onClick={() => {
-                  this.setState({
-                    openChangelog: true,
-                  });
-                }}
-              />
-            </>
-          )}
+            <Chip
+              className="changelog"
+              icon={<Receipt />}
+              label="Changelog"
+              onClick={() => {
+                this.setState({
+                  openChangelog: true,
+                });
+              }}
+            />
+          </>
+        )}
         <Dialog
           fullWidth={true}
           maxWidth="md"

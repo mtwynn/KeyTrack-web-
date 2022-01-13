@@ -4,15 +4,20 @@ import _ from "underscore";
 import {
   makeStyles,
   withStyles,
+  useMediaQuery,
   Avatar,
-  Dialog,
   Button,
-  Icon,
-  Input,
+  Box,
   Chip,
-  InputAdornment,
+  Collapse,
+  Dialog,
   Fab,
   FormControl,
+  Icon,
+  Input,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
   Table,
   TableCell,
   TableRow,
@@ -22,11 +27,11 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  useMediaQuery,
   Select,
-  InputLabel,
-  MenuItem,
 } from "@material-ui/core";
+
+import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 
 import { useTheme } from "@material-ui/core/styles";
 import { ArrowUpward, Close, Search, Delete } from "@material-ui/icons";
@@ -123,7 +128,7 @@ const useStyles = makeStyles((theme) => ({
     borderWidth: "10px",
   },
   input: {
-    color: 'white'
+    color: "white",
   },
   filter: {
     marginLeft: theme.spacing(3),
@@ -164,12 +169,12 @@ const useStyles = makeStyles((theme) => ({
   },
   root: {
     fill: "white",
-    color: "white"
+    color: "white",
   },
-  
+
   button: {
     margin: theme.spacing(1),
-    color: "white"
+    color: "white",
   },
 }));
 
@@ -387,6 +392,128 @@ let Playlist = (props) => {
     document.getElementById("maxBpm").value = "";
   };
 
+  function Row(props) {
+    const { item } = props;
+    const [open, setOpen] = React.useState(false);
+
+    let dummyProgressions = [
+      {
+        id: item.track._id,
+        verse: "I V vi IV",
+        preChorus: "I V vi IV",
+        chorus: "I V vi IV",
+        buildUp: "I V vi IV",
+        drop: "I V vi IV",
+        bridge: "I V vi IV",
+      },
+    ];
+
+    return (
+      <React.Fragment>
+        <TableRow
+          key={item.track.id}
+          hover
+          style={{ cursor: "pointer" }}
+          onClick={(event) => handleRowClick(event, item)}
+          sx={{ "& > *": { borderBottom: "unset" } }}
+        >
+          <TableCell>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(!open);
+              }}
+            >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </TableCell>
+          <TableCell>
+            <Avatar
+              variant="square"
+              src={
+                item.track.album.images[0]
+                  ? item.track.album.images[0].url
+                  : null
+              }
+            ></Avatar>
+          </TableCell>
+          <TableCell>{item.track.name}</TableCell>
+          <TableCell>
+            {item.track.artists.map((artist) => artist.name).join(", ")}
+          </TableCell>
+          <TableCell>
+            {getKey(item.track.id) || getKey(item.track.id) === 0
+              ? KeyMap[getKey(item.track.id).key].key
+              : "N/A"}
+          </TableCell>
+          <TableCell>
+            {getKey(item.track.id) || getKey(item.track.id) === 0
+              ? getKey(item.track.id).mode === 1
+                ? "Major"
+                : "Minor"
+              : "N/A"}
+          </TableCell>
+          <TableCell>
+            {getKey(item.track.id) || getKey(item.track.id) === 0
+              ? KeyMap[getKey(item.track.id).key].camelot[
+                  getKey(item.track.id).mode
+                ]
+              : "N/A"}
+          </TableCell>
+          <TableCell>
+            {getKey(item.track.id) || getKey(item.track.id) === 0
+              ? KeyMap[getKey(item.track.id).key].open[
+                  getKey(item.track.id).mode
+                ]
+              : "N/A"}
+          </TableCell>
+          <TableCell>
+            {getKey(item.track.id) || getKey(item.track.id) === 0
+              ? Math.round(getKey(item.track.id).bpm)
+              : "N/A"}
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                <Typography variant="h6" gutterBottom component="div">
+                  Chord Progressions
+                </Typography>
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Verse</TableCell>
+                      <TableCell>Pre-Chorus</TableCell>
+                      <TableCell>Chorus</TableCell>
+                      <TableCell>Build-up</TableCell>
+                      <TableCell>Drop</TableCell>
+                      <TableCell>Bridge</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {dummyProgressions.map((progression) => (
+                      <TableRow key={progression.id}>
+                        <TableCell>{progression.verse}</TableCell>
+                        <TableCell>{progression.preChorus}</TableCell>
+                        <TableCell>{progression.chorus}</TableCell>
+                        <TableCell>{progression.buildUp}</TableCell>
+                        <TableCell>{progression.drop}</TableCell>
+                        <TableCell>{progression.bridge}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </React.Fragment>
+    );
+  }
+
   return (
     <div className="m-div">
       <Dialog
@@ -428,7 +555,7 @@ let Playlist = (props) => {
             <Typography variant="overline" className={classes.title}>
               Filters
             </Typography>
-            
+
             <div>
               <FormControl className={classes.filter}>
                 <InputLabel id="demo-simple-select-label">Wheel</InputLabel>
@@ -585,6 +712,7 @@ let Playlist = (props) => {
           <Table>
             <TableHead ref={topRef}>
               <TableRow>
+                <StyledTableCell></StyledTableCell>
                 <StyledTableCell>Cover Art</StyledTableCell>
                 <StyledTableCell>Track</StyledTableCell>
                 <StyledTableCell>Artist</StyledTableCell>
@@ -615,60 +743,7 @@ let Playlist = (props) => {
                   return aBPM - bBPM;
                 })
                 .map((item) => (
-                  <TableRow
-                    key={item.track.id}
-                    hover
-                    style={{ cursor: "pointer" }}
-                    onClick={(event) => handleRowClick(event, item)}
-                  >
-                    <TableCell>
-                      <Avatar
-                        variant="square"
-                        src={
-                          item.track.album.images[0]
-                            ? item.track.album.images[0].url
-                            : null
-                        }
-                      ></Avatar>
-                    </TableCell>
-                    <TableCell>{item.track.name}</TableCell>
-                    <TableCell>
-                      {item.track.artists
-                        .map((artist) => artist.name)
-                        .join(", ")}
-                    </TableCell>
-                    <TableCell>
-                      {getKey(item.track.id) || getKey(item.track.id) === 0
-                        ? KeyMap[getKey(item.track.id).key].key
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {getKey(item.track.id) || getKey(item.track.id) === 0
-                        ? getKey(item.track.id).mode === 1
-                          ? "Major"
-                          : "Minor"
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {getKey(item.track.id) || getKey(item.track.id) === 0
-                        ? KeyMap[getKey(item.track.id).key].camelot[
-                            getKey(item.track.id).mode
-                          ]
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {getKey(item.track.id) || getKey(item.track.id) === 0
-                        ? KeyMap[getKey(item.track.id).key].open[
-                            getKey(item.track.id).mode
-                          ]
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {getKey(item.track.id) || getKey(item.track.id) === 0
-                        ? Math.round(getKey(item.track.id).bpm)
-                        : "N/A"}
-                    </TableCell>
-                  </TableRow>
+                  <Row item={item} />
                 ))}
             </TableBody>
           </Table>
