@@ -1,12 +1,10 @@
 import React, { Fragment } from "react";
-import Axios from "axios";
 
 import {
   Avatar,
   IconButton,
   CircularProgress,
   Dialog,
-  LinearProgress,
   Table,
   TableBody,
   TableCell,
@@ -57,6 +55,11 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    "&:hover": {
+      background: "#bcf6d0",
+    },
+    transition: "background .15s ease-in",
+    cursor: "pointer",
   },
 }))(TableRow);
 
@@ -156,7 +159,10 @@ let PLLibrary = (props) => {
           <TableBody>
             {props.pllibrary.items.map((playlist) => (
               <Fragment key={playlist.id}>
-                <StyledTableRow key={playlist.id}>
+                <StyledTableRow
+                  key={playlist.id}
+                  onClick={() => handlePlaylistOpen(playlist)}
+                >
                   <StyledTableCell>
                     <IconButton onClick={() => handlePlaylistOpen(playlist)}>
                       <MenuOpen />
@@ -190,6 +196,7 @@ let PLLibrary = (props) => {
           playlist={currPlaylist}
           playlistKeys={playlistKeys}
           token={props.token}
+          userId={props.userId}
         />
       ) : null}
     </>
