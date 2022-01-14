@@ -1,5 +1,15 @@
 const changelog = [
   {
+    version: "1.0.8",
+    date: "01/14/22",
+    changes: [
+      {
+        type: "feature",
+        desc: "Added ability to save user-inputted chord progressions on Playlist songs",
+      },
+    ],
+  },
+  {
     version: "1.0.7",
     date: "12/15/21",
     changes: [
@@ -29,8 +39,7 @@ const changelog = [
     changes: [
       {
         type: "bugfix",
-        desc:
-          "Changed fullscreen display of playlist to stretch for XL (1920w) screens.",
+        desc: "Changed fullscreen display of playlist to stretch for XL (1920w) screens.",
       },
       {
         type: "bugfix",
@@ -48,8 +57,7 @@ const changelog = [
     changes: [
       {
         type: "bugfix",
-        desc:
-          "Fixed bug where null tracks in playlist would crash application.",
+        desc: "Fixed bug where null tracks in playlist would crash application.",
       },
     ],
   },
