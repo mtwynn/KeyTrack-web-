@@ -255,7 +255,10 @@ class App extends React.Component {
           </div>
           {this.state.showPlaylists && (
             <>
-              <Chip label="v1.0.5" className="version-label" />
+              <Chip
+                label={"v" + changelog[0].version}
+                className="version-label"
+              />
 
               <Chip
                 className="changelog"
@@ -273,7 +276,10 @@ class App extends React.Component {
 
         {!this.state.showPlaylists && (
           <>
-            <Chip label="v1.0.7" className="version-label" />
+            <Chip
+              label={"v" + changelog[0].version}
+              className="version-label"
+            />
 
             <Chip
               className="changelog"
