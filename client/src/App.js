@@ -16,7 +16,6 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  makeStyles,
   withStyles,
 } from "@material-ui/core";
 
@@ -30,14 +29,7 @@ import KeyCalculator from "./utils/KeyCalculator";
 
 import Axios from "axios";
 
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-import { firebaseConfig } from "../src/config/firebaseConfig";
-
 const spotifyWebApi = new Spotify();
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore();
 
 let isProduction = process.env.NODE_ENV === "production";
 
@@ -66,12 +58,6 @@ const GreenButton = withStyles((theme) => ({
     ].join(","),
   },
 }))(Button);
-
-const useStyles = makeStyles((theme) => ({
-  margin: {
-    margin: theme.spacing(1),
-  },
-}));
 
 class App extends React.Component {
   constructor(props) {
@@ -167,24 +153,26 @@ class App extends React.Component {
   }
 
   render() {
-    let self = this;
     return (
       <div className="App m-div">
         <FadeIn transitionDuration={1000}>
-          <a href={server}>
-            <GreenButton
-              variant="contained"
-              color="primary"
-              style={
-                this.state.loggedIn
-                  ? null
-                  : { animation: "float 1s ease-in-out infinite" }
+          <GreenButton
+            variant="contained"
+            color="primary"
+            style={
+              this.state.loggedIn
+                ? { cursor: "none" }
+                : { animation: "float 1s ease-in-out infinite" }
+            }
+            disabled={this.state.loggedIn}
+            onClick={() => {
+              if (!this.state.loggedIn) {
+                window.location = server;
               }
-              disabled={!this.state.loggedIn}
-            >
-              Login with Spotify
-            </GreenButton>
-          </a>
+            }}
+          >
+            Login with Spotify
+          </GreenButton>
 
           <div className="m-div">
             Logged in as: <b>{this.state.user_name}</b>
@@ -217,9 +205,20 @@ class App extends React.Component {
                   variant="contained"
                   color="secondary"
                   onClick={() => {
-                    console.log("logging out");
-                    console.log("Cookies: ");
-                    alert(document.cookie);
+                    this.setState({
+                      loggedIn: false,
+                      nowPlaying: {
+                        name: "Nothing currently playing",
+                        image: null,
+                      },
+                      user_id: "",
+                      access_token: "",
+                      user_name: "",
+                      showPlaylists: false,
+                      showKeyCalculator: false,
+                      pllibrary: null,
+                    });
+                    window.location = window.location.href.split("/")[0];
                   }}
                   disabled={!this.state.loggedIn}
                 >
@@ -256,7 +255,10 @@ class App extends React.Component {
           </div>
           {this.state.showPlaylists && (
             <>
-              <Chip label="v1.0.5" className="version-label" />
+              <Chip
+                label={"v" + changelog[0].version}
+                className="version-label"
+              />
 
               <Chip
                 className="changelog"
@@ -274,7 +276,10 @@ class App extends React.Component {
 
         {!this.state.showPlaylists && (
           <>
-            <Chip label="v1.0.7" className="version-label" />
+            <Chip
+              label={"v" + changelog[0].version}
+              className="version-label"
+            />
 
             <Chip
               className="changelog"

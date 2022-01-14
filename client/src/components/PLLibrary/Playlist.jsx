@@ -13,7 +13,6 @@ import {
   Dialog,
   Fab,
   FormControl,
-  Icon,
   Input,
   InputAdornment,
   InputLabel,
@@ -121,7 +120,6 @@ const openKeys = [
 const useStyles = makeStyles((theme) => ({
   appBar: {
     position: "-webkit-sticky",
-    position: "sticky",
     backgroundColor: "#191414",
   },
   title: {
@@ -398,12 +396,13 @@ let Playlist = (props) => {
 
   const getKeysForWheel = (wheel) => {
     switch (wheel) {
-      case "Musical":
-        return musicalKeys;
       case "Camelot":
         return camelotKeys;
       case "Open":
         return openKeys;
+      case "Musical":
+      default:
+        return musicalKeys;
     }
   };
 
