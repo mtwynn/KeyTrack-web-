@@ -7,7 +7,6 @@ import {
   CardContent,
   CardMedia,
   CircularProgress,
-  Fade,
   Grid,
   Typography,
   makeStyles,
