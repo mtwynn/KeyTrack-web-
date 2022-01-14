@@ -168,21 +168,6 @@ class App extends React.Component {
 
   render() {
     let self = this;
-    if (self.state.user_id) {
-      (async function () {
-        console.log(self.state.user_id);
-        const docRef = doc(db, "Users", self.state.user_id);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          console.log("Document data:", docSnap.data());
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-      })();
-    }
-
     return (
       <div className="App m-div">
         <FadeIn transitionDuration={1000}>
@@ -249,6 +234,7 @@ class App extends React.Component {
                   <PLLibrary
                     token={this.state.access_token}
                     pllibrary={this.state.pllibrary}
+                    userId={this.state.user_id}
                   />
                 </FadeIn>
               </Grid>

@@ -23,6 +23,7 @@ import {
   TableRow,
   TableBody,
   TableHead,
+  TextField,
   AppBar,
   Toolbar,
   IconButton,
@@ -38,8 +39,14 @@ import { ArrowUpward, Close, Search, Delete } from "@material-ui/icons";
 import Spotify from "spotify-web-api-js";
 import SpotifyPlayer from "react-spotify-web-playback";
 
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../../../src/config/firebaseConfig";
+import { doc, getDoc, getFirestore, updateDoc } from "firebase/firestore";
+
 import KeyMap from "../../utils/KeyMap";
 import { useEffect } from "react";
+
+initializeApp(firebaseConfig);
 
 const qualities = ["Major", "Minor"];
 const musicalKeys = [
@@ -213,6 +220,7 @@ let Playlist = (props) => {
   let [searchItems, setSearchItems] = React.useState(allItems);
   let [uris, setUris] = React.useState([]);
   let [isPlaying, setIsPlaying] = React.useState(false);
+  let [chordProgressions, setChordProgressions] = React.useState({});
 
   let topRef = React.createRef();
 
@@ -227,6 +235,8 @@ let Playlist = (props) => {
 
     setIsPlaying(true);
   };
+
+  const db = getFirestore();
 
   const spotifyWebApi = new Spotify();
   spotifyWebApi.setAccessToken(props.token);
@@ -254,6 +264,20 @@ let Playlist = (props) => {
   };
 
   useEffect(() => {
+    let getChordProgressions = async () => {
+      const docRef = doc(db, "Users", props.userId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setChordProgressions(docSnap.data().chordProgressions || {});
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    };
+
+    getChordProgressions();
+
     if (
       keyFilter.length === 0 &&
       qualityFilter.length === 0 &&
@@ -395,18 +419,21 @@ let Playlist = (props) => {
   function Row(props) {
     const { item } = props;
     const [open, setOpen] = React.useState(false);
+    const [editChords, setEditChords] = React.useState(false);
+    const [oldProgressions, setOldProgressions] = React.useState(
+      chordProgressions[item.track.id] || {}
+    );
+    const [progressions, setProgressions] = React.useState(
+      chordProgressions[item.track.id] || {}
+    );
 
-    let dummyProgressions = [
-      {
-        id: item.track._id,
-        verse: "I V vi IV",
-        preChorus: "I V vi IV",
-        chorus: "I V vi IV",
-        buildUp: "I V vi IV",
-        drop: "I V vi IV",
-        bridge: "I V vi IV",
-      },
-    ];
+    let handleChordProgressionChange = (e) => {
+      let newObj = { ...progressions };
+      newObj[e.target.id] = e.target.value;
+      setProgressions(newObj);
+    };
+
+    const progressionRef = doc(db, `Users/${props.userId}`);
 
     return (
       <React.Fragment>
@@ -476,12 +503,64 @@ let Playlist = (props) => {
           </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
             <Collapse in={open} timeout="auto" unmountOnExit>
-              <Box sx={{ margin: 1 }}>
+              <Box>
                 <Typography variant="h6" gutterBottom component="div">
                   Chord Progressions
                 </Typography>
+                {editChords ? (
+                  <>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setEditChords(false);
+
+                        setOldProgressions(progressions);
+
+                        console.log("Saving...");
+                        console.log(progressions);
+                        let route = `chordProgressions.${item.track.id}`;
+
+                        updateDoc(progressionRef, {
+                          [route]: progressions,
+                        });
+                      }}
+                    >
+                      Save Chords
+                    </Button>{" "}
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setEditChords(false);
+
+                        console.log("Cancelling");
+                        setProgressions(oldProgressions);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setEditChords(true);
+                      }}
+                    >
+                      Edit Chords
+                    </Button>
+                  </>
+                )}
+
                 <Table size="small" aria-label="purchases">
                   <TableHead>
                     <TableRow>
@@ -494,16 +573,88 @@ let Playlist = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {dummyProgressions.map((progression) => (
-                      <TableRow key={progression.id}>
-                        <TableCell>{progression.verse}</TableCell>
-                        <TableCell>{progression.preChorus}</TableCell>
-                        <TableCell>{progression.chorus}</TableCell>
-                        <TableCell>{progression.buildUp}</TableCell>
-                        <TableCell>{progression.drop}</TableCell>
-                        <TableCell>{progression.bridge}</TableCell>
-                      </TableRow>
-                    ))}
+                    <TableRow key={item.track.id}>
+                      <TableCell>
+                        {editChords ? (
+                          <TextField
+                            id="verse"
+                            variant="outlined"
+                            size="small"
+                            placeholder='ex. "C G Am F"'
+                            defaultValue={progressions.verse}
+                            onChange={handleChordProgressionChange}
+                          />
+                        ) : (
+                          <strong>{progressions.verse}</strong>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editChords ? (
+                          <TextField
+                            id="preChorus"
+                            variant="outlined"
+                            size="small"
+                            placeholder='ex. "I V vi IV"'
+                            value={progressions.preChorus}
+                            onChange={handleChordProgressionChange}
+                          />
+                        ) : (
+                          <strong>{progressions.preChorus}</strong>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editChords ? (
+                          <TextField
+                            id="chorus"
+                            variant="outlined"
+                            size="small"
+                            value={progressions.chorus}
+                            onChange={handleChordProgressionChange}
+                          />
+                        ) : (
+                          <strong>{progressions.chorus}</strong>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editChords ? (
+                          <TextField
+                            id="buildUp"
+                            variant="outlined"
+                            size="small"
+                            value={progressions.buildUp}
+                            onChange={handleChordProgressionChange}
+                          />
+                        ) : (
+                          <strong>{progressions.buildUp}</strong>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editChords ? (
+                          <TextField
+                            id="drop"
+                            variant="outlined"
+                            size="small"
+                            value={progressions.drop}
+                            onChange={handleChordProgressionChange}
+                          />
+                        ) : (
+                          <strong>{progressions.drop}</strong>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editChords ? (
+                          <TextField
+                            id="bridge"
+                            variant="outlined"
+                            size="small"
+                            value={progressions.bridge}
+                            onChange={handleChordProgressionChange}
+                          />
+                        ) : (
+                          <strong>{progressions.bridge}</strong>
+                        )}
+                      </TableCell>
+                    </TableRow>
                   </TableBody>
                 </Table>
               </Box>
@@ -743,7 +894,7 @@ let Playlist = (props) => {
                   return aBPM - bBPM;
                 })
                 .map((item) => (
-                  <Row item={item} />
+                  <Row item={item} userId={props.userId} />
                 ))}
             </TableBody>
           </Table>
