@@ -119,7 +119,7 @@ const openKeys = [
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
-    position: "-webkit-sticky",
+    position: "sticky",
     backgroundColor: "#191414",
   },
   title: {
