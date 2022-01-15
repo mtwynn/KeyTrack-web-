@@ -124,6 +124,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flex: 0,
+    marginLeft: theme.spacing(3),
   },
   search: {
     flex: 1,
@@ -672,10 +673,10 @@ let Playlist = (props) => {
         onClose={props.handlePlaylistClose}
       >
         <AppBar className={classes.appBar}>
+          <Typography variant="h6" className={classes.title}>
+            {props.playlistName}
+          </Typography>
           <Toolbar>
-            <Typography variant="h6" className={classes.title}>
-              {props.playlistName}
-            </Typography>
             <Input
               classes={{
                 root: classes.search,
