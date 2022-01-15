@@ -7,6 +7,10 @@ const changelog = [
         type: "feature",
         desc: "Added ability to save user-inputted chord progressions on Playlist songs",
       },
+      {
+        type: "bugfix",
+        desc: "Fixed logout not behaving like a logout, and added session expiry dialog to make clear that session has expired",
+      },
     ],
   },
   {
