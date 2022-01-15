@@ -78,6 +78,7 @@ class App extends React.Component {
       showKeyCalculator: false,
       pllibrary: null,
       openChangelog: false,
+      showSessionExpiryDialog: false,
     };
 
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
@@ -98,6 +99,16 @@ class App extends React.Component {
           user_name: user.data.display_name,
         });
       });
+    }
+  }
+
+  componentDidMount() {
+    if (this.state.loggedIn) {
+      setTimeout(() => {
+        this.setState({
+          showSessionExpiryDialog: true,
+        });
+      }, 3600 * 1000);
     }
   }
 
@@ -152,27 +163,61 @@ class App extends React.Component {
     });
   }
 
+  handleCloseSessionExpiryDialog() {
+    this.setState({
+      showSessionExpiryDialog: false,
+    });
+  }
+
+  handleLogout() {
+    this.setState({
+      loggedIn: false,
+      nowPlaying: {
+        name: "Nothing currently playing",
+        image: null,
+      },
+      user_id: "",
+      access_token: "",
+      user_name: "",
+      showPlaylists: false,
+      showKeyCalculator: false,
+      pllibrary: null,
+    });
+    window.location = window.location.href.split("/")[0];
+  }
+
   render() {
     return (
       <div className="App m-div">
         <FadeIn transitionDuration={1000}>
-          <GreenButton
-            variant="contained"
-            color="primary"
-            style={
-              this.state.loggedIn
-                ? { cursor: "none" }
-                : { animation: "float 1s ease-in-out infinite" }
-            }
-            disabled={this.state.loggedIn}
-            onClick={() => {
-              if (!this.state.loggedIn) {
-                window.location = server;
+          {this.state.loggedIn ? (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleLogout.bind(this)}
+              disabled={!this.state.loggedIn}
+            >
+              Log Out
+            </Button>
+          ) : (
+            <GreenButton
+              variant="contained"
+              color="primary"
+              style={
+                this.state.loggedIn
+                  ? { cursor: "none" }
+                  : { animation: "float 1s ease-in-out infinite" }
               }
-            }}
-          >
-            Login with Spotify
-          </GreenButton>
+              disabled={this.state.loggedIn}
+              onClick={() => {
+                if (!this.state.loggedIn) {
+                  window.location.href = server;
+                }
+              }}
+            >
+              Login with Spotify
+            </GreenButton>
+          )}
 
           <div className="m-div">
             Logged in as: <b>{this.state.user_name}</b>
@@ -197,32 +242,6 @@ class App extends React.Component {
               <div className="m-div">
                 <Button variant="contained" onClick={this.openKeyCalculator}>
                   Key Calculator
-                </Button>
-              </div>
-
-              <div className="m-div">
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => {
-                    this.setState({
-                      loggedIn: false,
-                      nowPlaying: {
-                        name: "Nothing currently playing",
-                        image: null,
-                      },
-                      user_id: "",
-                      access_token: "",
-                      user_name: "",
-                      showPlaylists: false,
-                      showKeyCalculator: false,
-                      pllibrary: null,
-                    });
-                    window.location = window.location.href.split("/")[0];
-                  }}
-                  disabled={!this.state.loggedIn}
-                >
-                  Log Out
                 </Button>
               </div>
             </Grid>
@@ -342,6 +361,31 @@ class App extends React.Component {
               color="primary"
             >
               Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog maxWidth="md" open={this.state.showSessionExpiryDialog}>
+          <DialogTitle>Oops!</DialogTitle>
+          <DialogContent>
+            Your Spotify session has expired. You can refresh your session for
+            another hour by logging in again.
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleLogout.bind(this)} variant="outlined">
+              Logout
+            </Button>
+            <Button
+              onClick={() => {
+                window.location.href = server;
+              }}
+              style={{
+                backgroundColor: "#1ED760",
+              }}
+              color="primary"
+              variant="contained"
+            >
+              Login
             </Button>
           </DialogActions>
         </Dialog>
