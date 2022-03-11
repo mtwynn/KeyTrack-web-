@@ -929,6 +929,7 @@ let Playlist = (props) => {
             }}
             play={isPlaying}
             showSaveIcon={true}
+            magnifySliderOnHover={true}
           />
           <Fab
             variant="extended"

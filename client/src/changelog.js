@@ -1,5 +1,19 @@
 const changelog = [
   {
+    version: "1.0.9",
+    date: "03/10/22",
+    changes: [
+      {
+        type: "feature",
+        desc: "Added magnify slider on hover for Spotify Web player",
+      },
+      {
+        type: "bugfix",
+        desc: "Re-wrote logic to fetch all user playlists when fetching, not just the first 50",
+      },
+    ],
+  },
+  {
     version: "1.0.8",
     date: "01/14/22",
     changes: [

@@ -157,7 +157,7 @@ let PLLibrary = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.pllibrary.items.map((playlist) => (
+            {props.pllibrary.map((playlist) => (
               <Fragment key={playlist.id}>
                 <StyledTableRow
                   key={playlist.id}
