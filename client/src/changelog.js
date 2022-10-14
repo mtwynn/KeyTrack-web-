@@ -1,5 +1,19 @@
 const changelog = [
   {
+    version: "1.1.0",
+    date: "10/14/22",
+    changes: [
+      {
+        type: "feature",
+        desc: "Added search functionality to playlists library",
+      },
+      {
+        type: "bugfix",
+        desc: "Fixed handling undefined playlist image url when rendering playlist library",
+      },
+    ],
+  },
+  {
     version: "1.0.9",
     date: "03/10/22",
     changes: [

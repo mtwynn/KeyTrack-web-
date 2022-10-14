@@ -142,12 +142,18 @@ class App extends React.Component {
   async getUserPlaylists() {
     let allPlaylists = [];
     let offset = 50;
-    let response = await spotifyWebApi.getUserPlaylists(this.state.user_id, { limit: 50, offset: 0 });
+    let response = await spotifyWebApi.getUserPlaylists(this.state.user_id, {
+      limit: 50,
+      offset: 0,
+    });
     allPlaylists = response.items;
 
     let next = response.next;
     while (next !== null) {
-      let nextGroup = await spotifyWebApi.getUserPlaylists(this.state.user_id, { limit: 50, offset: offset})
+      let nextGroup = await spotifyWebApi.getUserPlaylists(this.state.user_id, {
+        limit: 50,
+        offset: offset,
+      });
       allPlaylists = allPlaylists.concat(nextGroup.items);
       next = nextGroup.next;
       offset += 50;
@@ -289,7 +295,7 @@ class App extends React.Component {
 
               <Chip
                 className="changelog"
-                style={{ padding: "0.3rem"}}
+                style={{ padding: "0.3rem" }}
                 icon={<Receipt />}
                 label="Changelog"
                 onClick={() => {
@@ -311,7 +317,7 @@ class App extends React.Component {
 
             <Chip
               className="changelog"
-              style={{ padding: "0.3rem"}}
+              style={{ padding: "0.3rem" }}
               icon={<Receipt />}
               label="Changelog"
               onClick={() => {

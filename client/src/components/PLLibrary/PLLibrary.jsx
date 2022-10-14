@@ -1,26 +1,32 @@
 import React, { Fragment } from "react";
+import _ from "underscore";
 
 import {
+  AppBar,
   Avatar,
   IconButton,
   CircularProgress,
   Dialog,
+  Input,
+  InputAdornment,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Toolbar,
   Paper,
   makeStyles,
   withStyles,
 } from "@material-ui/core";
 
-import { MenuOpen } from "@material-ui/icons";
+import { MenuOpen, Search } from "@material-ui/icons";
 
 import Spotify from "spotify-web-api-js";
 
 import Playlist from "./Playlist";
+import { useEffect } from "react";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -34,8 +40,21 @@ const StyledTableCell = withStyles((theme) => ({
 }))(TableCell);
 
 const useStyles = makeStyles((theme) => ({
+  appBar: {
+    position: "sticky",
+    backgroundColor: "#191414",
+    borderRadius: "8px 8px 0 0",
+  },
+  search: {
+    flex: 1,
+    color: "white",
+    marginRight: theme.spacing(3),
+    marginLeft: theme.spacing(3),
+    borderWidth: "10px",
+  },
   root: {
     display: "inline-block",
+    borderRadius: "0 0 4px 4px",
   },
   loadingDialog: {
     backgroundColor: "transparent",
@@ -69,9 +88,48 @@ let PLLibrary = (props) => {
   const [currPlaylist, setCurrPlaylist] = React.useState(null);
   const [playlistKeys, setPlaylistKeys] = React.useState(null);
   const [playlistName, setPlaylistName] = React.useState("");
+  const [search, setSearch] = React.useState("");
+  const [searchItems, setSearchItems] = React.useState(props.pllibrary);
 
   const spotifyWebApi = new Spotify();
   spotifyWebApi.setAccessToken(props.token);
+
+  useEffect(() => {
+    if (search === "") {
+      _.debounce(setSearchItems(props.pllibrary), 500);
+    } else {
+      _.debounce(
+        setSearchItems(() => {
+          let filteredItems = props.pllibrary;
+
+          if (search !== "") {
+            filteredItems = filteredItems.filter((item) => {
+              const {
+                name: title,
+                description,
+                owner: { display_name: owner },
+              } = item;
+
+              console.log(description);
+
+              return (
+                title.toLowerCase().includes(search) ||
+                description.toLowerCase().includes(search) ||
+                owner.toLowerCase().includes(search)
+              );
+            });
+          }
+
+          return filteredItems;
+        }, 500)
+      );
+    }
+  }, [search]);
+
+  let handleChange = _.debounce((event) => {
+    event.persist();
+    setSearch(String(event.target.value).toLowerCase());
+  }, 500);
 
   let handlePlaylistOpen = (playlist) => {
     let numRequests = Math.ceil(playlist.tracks.total / 100);
@@ -144,6 +202,25 @@ let PLLibrary = (props) => {
           disableShrink
         />
       </Dialog>
+      <AppBar className={classes.appBar}>
+        <Toolbar>
+          <Input
+            classes={{
+              root: classes.search,
+              focused: classes.inputFocused,
+            }}
+            type={"text"}
+            onChange={handleChange}
+            placeholder="Search Playlists"
+            endAdornment={
+              <InputAdornment position="end">
+                <Search />
+              </InputAdornment>
+            }
+          />
+        </Toolbar>
+      </AppBar>
+
       <TableContainer component={Paper} className={classes.root}>
         <Table className={classes.table} aria-label="customized table">
           <TableHead>
@@ -157,7 +234,7 @@ let PLLibrary = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.pllibrary.map((playlist) => (
+            {searchItems.map((playlist) => (
               <Fragment key={playlist.id}>
                 <StyledTableRow
                   key={playlist.id}
@@ -171,7 +248,9 @@ let PLLibrary = (props) => {
                   <StyledTableCell>
                     <Avatar
                       variant="square"
-                      src={playlist.images[0].url}
+                      src={
+                        playlist.images[0] ? playlist.images[0].url : undefined
+                      }
                     ></Avatar>
                   </StyledTableCell>
                   <StyledTableCell>{playlist.name}</StyledTableCell>

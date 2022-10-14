@@ -416,6 +416,7 @@ let Playlist = (props) => {
     document.getElementById("maxBpm").value = "";
   };
 
+  // TODO: Abstract this to new component
   function Row(props) {
     const { item } = props;
     const [open, setOpen] = React.useState(false);
