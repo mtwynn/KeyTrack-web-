@@ -15,13 +15,7 @@ const cookieParser = require("cookie-parser");
 
 const client_id = process.env.SPOTIFY_ID; // Your client id
 const client_secret = process.env.SPOTIFY_SECRET; // Your secret
-// const redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
-const redirect_uri = "https://key-track2.herokuapp.com/callback/";
-
-console.log("CLIENT ID: ");
-console.log(client_id);
-console.log(client_secret);
-console.log(process.env);
+const redirect_uri = process.env.NODE_ENV === 'production' ? "https://key-track2.herokuapp.com/callback/" : "http://localhost:8888/callback";
 
 // Soundcloud Stuff
 // SC.initialize({
@@ -61,6 +55,8 @@ app.get("/login", function (req, res) {
   // your application requests authorization
   var scope =
     "user-read-private user-read-email user-read-playback-state playlist-read-private playlist-read-collaborative";
+
+  console.log("Redirect:", redirect_uri);
   res.redirect(
     "https://accounts.spotify.com/authorize?" +
     querystring.stringify({
@@ -78,6 +74,7 @@ app.get("/callback", function (req, res) {
   // your application requests refresh and access tokens
   // after checking the state parameter
 
+  console.log("Callback");
   var code = req.query.code || null;
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
@@ -90,6 +87,7 @@ app.get("/callback", function (req, res) {
       })
     );
   } else {
+    console.log("Authing with redirect_uri", redirect_uri);
     res.clearCookie(stateKey);
     var authOptions = {
       url: "https://accounts.spotify.com/api/token",
@@ -129,6 +127,7 @@ app.get("/callback", function (req, res) {
 
         res.cookie("creds", creds);
 
+        console.log("Redirecting to main app with access and refresh tokens");
         res.redirect(
           302,
           "http://localhost:3000/#" +
