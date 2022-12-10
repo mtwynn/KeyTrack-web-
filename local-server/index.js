@@ -128,7 +128,7 @@ app.get("/callback", function (req, res) {
 
         res.redirect(
           302,
-          (isProduction ? "https://key-track.netlify.app/" : "http://localhost:3000/#") +
+          (isProduction ? "https://key-track.netlify.app/?" : "http://localhost:3000/#") +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token,
