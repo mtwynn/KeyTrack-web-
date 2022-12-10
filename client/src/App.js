@@ -34,7 +34,7 @@ const spotifyWebApi = new Spotify();
 let isProduction = process.env.NODE_ENV === "production";
 
 let server = isProduction
-  ? "https://keytrack.herokuapp.com/"
+  ? "https://key-track2.herokuapp.com/"
   : "http://localhost:8888/";
 
 const GreenButton = withStyles((theme) => ({
