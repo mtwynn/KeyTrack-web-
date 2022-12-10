@@ -197,7 +197,8 @@ class App extends React.Component {
       showKeyCalculator: false,
       pllibrary: null,
     });
-    window.location = window.location.href.split("/")[0];
+
+    window.location.href = window.location.origin;
   }
 
   render() {
