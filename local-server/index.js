@@ -17,8 +17,8 @@ var credentials = require("../credentials.js");
 
 var client_id = credentials.id; // Your client id
 var client_secret = credentials.secret; // Your secret
-var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
-//var redirect_uri = "https://keytrack.herokuapp.com/callback/";
+// var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
+var redirect_uri = "https://keytrack2.herokuapp.com/callback/";
 
 // Soundcloud Stuff
 // SC.initialize({
@@ -60,14 +60,14 @@ app.get("/login", function (req, res) {
     "user-read-private user-read-email user-read-playback-state playlist-read-private playlist-read-collaborative";
   res.redirect(
     "https://accounts.spotify.com/authorize?" +
-      querystring.stringify({
-        response_type: "code",
-        client_id: client_id,
-        scope: scope,
-        redirect_uri: redirect_uri,
-        state: state,
-        show_dialog: true,
-      })
+    querystring.stringify({
+      response_type: "code",
+      client_id: client_id,
+      scope: scope,
+      redirect_uri: redirect_uri,
+      state: state,
+      show_dialog: true,
+    })
   );
 });
 
@@ -82,9 +82,9 @@ app.get("/callback", function (req, res) {
   if (state === null || state !== storedState) {
     res.redirect(
       "/#" +
-        querystring.stringify({
-          error: "state_mismatch",
-        })
+      querystring.stringify({
+        error: "state_mismatch",
+      })
     );
   } else {
     res.clearCookie(stateKey);
@@ -129,17 +129,17 @@ app.get("/callback", function (req, res) {
         res.redirect(
           302,
           "http://localhost:3000/#" +
-            querystring.stringify({
-              access_token: access_token,
-              refresh_token: refresh_token,
-            })
+          querystring.stringify({
+            access_token: access_token,
+            refresh_token: refresh_token,
+          })
         );
       } else {
         res.redirect(
           "/#" +
-            querystring.stringify({
-              error: "invalid_token",
-            })
+          querystring.stringify({
+            error: "invalid_token",
+          })
         );
       }
     });
