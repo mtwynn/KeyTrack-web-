@@ -7,18 +7,21 @@
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
 
-var express = require("express"); // Express web server framework
-var request = require("request"); // "Request" library
-var cors = require("cors");
-var querystring = require("querystring");
-var cookieParser = require("cookie-parser");
+const express = require("express"); // Express web server framework
+const request = require("request"); // "Request" library
+const cors = require("cors");
+const querystring = require("querystring");
+const cookieParser = require("cookie-parser");
 
-var credentials = require("../credentials.js");
+const client_id = process.env.SPOTIFY_ID; // Your client id
+const client_secret = process.env.SPOTIFY_SECRET; // Your secret
+// const redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
+const redirect_uri = "https://keytrack2.herokuapp.com/callback/";
 
-var client_id = credentials.id; // Your client id
-var client_secret = credentials.secret; // Your secret
-// var redirect_uri = "http://localhost:8888/callback"; // Your redirect uri
-var redirect_uri = "https://keytrack2.herokuapp.com/callback/";
+console.log("CLIENT ID: ");
+console.log(client_id);
+console.log(client_secret);
+console.log(process.env);
 
 // Soundcloud Stuff
 // SC.initialize({
