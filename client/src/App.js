@@ -1,7 +1,8 @@
-import React from "react";
-import "./App.css";
+import React from 'react';
+import Axios from 'axios';
+import './App.css';
 
-import Spotify from "spotify-web-api-js";
+import Spotify from 'spotify-web-api-js';
 import {
   Button,
   Chip,
@@ -17,126 +18,109 @@ import {
   ListItemText,
   Typography,
   withStyles,
-} from "@material-ui/core";
+} from '@material-ui/core';
 
-import { Build, Receipt, SettingsApplications } from "@material-ui/icons";
-import FadeIn from "react-fade-in";
+import { Build, Receipt, SettingsApplications } from '@material-ui/icons';
+import FadeIn from 'react-fade-in';
 
-import changelog from "./changelog.js";
-import CurrentSong from "./components/CurrentSong/CurrentSong";
-import PLLibrary from "./components/PLLibrary/PLLibrary";
-import KeyCalculator from "./utils/KeyCalculator";
+import changelog from './changelog.js';
+import CurrentSong from './components/CurrentSong/CurrentSong';
+import PLLibrary from './components/PLLibrary/PLLibrary';
+import KeyCalculator from './utils/KeyCalculator';
 
-import Axios from "axios";
+// Utils
+import { getHashParams } from './utils/utils';
+
+// Assets
+import { ReactComponent as SpotifyLogo } from '../src/assets/login/spotify.svg';
+import { ReactComponent as SoundcloudLogo } from '../src/assets/login/soundcloud.svg';
 
 const spotifyWebApi = new Spotify();
 
-let isProduction = process.env.NODE_ENV === "production";
+let isProduction = process.env.NODE_ENV === 'production';
 
-let server = isProduction
-  ? "https://key-track2.herokuapp.com/"
-  : "http://localhost:8888/";
+let spotifyLoginEndpoint = isProduction
+  ? 'https://key-track2.herokuapp.com/spotify/login'
+  : 'http://localhost:8888/spotify/login';
 
-const GreenButton = withStyles((theme) => ({
-  root: {
-    color: "#FFFFFF",
-    backgroundColor: "#1ED760",
-    "&:hover": {
-      backgroundColor: "#1DB954",
-    },
-    fontFamily: [
-      "-apple-system",
-      "BlinkMacSystemFont",
-      '"Segoe UI"',
-      "Roboto",
-      '"Helvetica Neue"',
-      "Arial",
-      "sans-serif",
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(","),
-  },
-}))(Button);
+let soundcloudLoginEndpoint = isProduction
+  ? 'https://key-track2.herokuapp.com/soundcloud/login'
+  : 'http://localhost:8888/soundcloud/login';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    const params = this.getHashParams();
+    // TODO move this to different component lifecycle
+    const spotifyParams = getHashParams();
+    const soundcloudParams = getHashParams('soundcloud');
 
     this.state = {
-      loggedIn: params.access_token ? true : false,
-      nowPlaying: {
-        name: "Nothing currently playing",
-        image: null,
-      },
-      user_id: "",
-      access_token: "",
-      user_name: "",
-      showPlaylists: false,
-      showKeyCalculator: false,
-      pllibrary: null,
       openChangelog: false,
-      showSessionExpiryDialog: false,
+      showKeyCalculator: false,
+      spotify: {
+        loggedIn: spotifyParams.access_token ? true : false,
+        nowPlaying: {
+          name: 'Nothing currently playing',
+          image: null,
+        },
+        user_id: '',
+        access_token: '',
+        user_name: '',
+        showPlaylists: false,
+        pllibrary: null,
+        showSessionExpiryDialog: false,
+      },
+      soundcloud: {
+        loggedIn: soundcloudParams.access_token ? true : false
+      }
     };
 
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
     this.openKeyCalculator = this.openKeyCalculator.bind(this);
 
-    if (params.access_token) {
-      console.log("Access token accepted");
-      spotifyWebApi.setAccessToken(params.access_token);
+    if (spotifyParams.access_token) {
+      spotifyWebApi.setAccessToken(spotifyParams.access_token);
 
       Axios.get(
-        `https://api.spotify.com/v1/me?access_token=${params.access_token}`
+        `https://api.spotify.com/v1/me?access_token=${spotifyParams.access_token}`
       ).then((user) => {
-        console.log("User id: " + user.data.id);
-        console.log(user);
         this.setState({
           user_id: user.data.id,
-          access_token: params.access_token,
+          access_token: spotifyParams.access_token,
           user_name: user.data.display_name,
         });
+      });
+    }
+
+    // TODO: Move all the Axios.get calls to a utils function for API endpoints
+    if (soundcloudParams.access_token) {
+      Axios.get('https://api.soundcloud.com/me', 
+        {
+          headers: {
+            'Accept': 'application/json; charset=utf-8',
+            'Authorization': `OAuth ${soundcloudParams.access_token}`
+          },
+        }
+      )
+      .then(response => {
+        // TODO: Do something with this response
+        console.log(response);
+      })
+      .catch(error => {
+        console.error(error);
       });
     }
   }
 
   componentDidMount() {
-    if (this.state.loggedIn) {
+    if (this.state.spotify.loggedIn) {
       setTimeout(() => {
         this.setState({
           showSessionExpiryDialog: true,
         });
       }, 3600 * 1000);
     }
-  }
-
-  getHashParams() {
-    let hashParams = {};
-    if (isProduction) {
-      // For use in production server
-      var urlString = window.location.href;
-      var url = new URL(urlString);
-      var a_token = new URLSearchParams(url.search).get("access_token");
-      var r_token = new URLSearchParams(url.search).get("refresh_token");
-
-      document.cookie = `a_token=${a_token}`;
-      document.cookie = `r_token=${r_token}`;
-      hashParams = { access_token: a_token, refresh_token: r_token };
-    } else {
-      // For use in local server
-      var e,
-        r = /([^&;=]+)=?([^&;]*)/g,
-        q = window.location.hash.substring(1);
-      while ((e = r.exec(q))) {
-        hashParams[e[1]] = decodeURIComponent(e[2]);
-      }
-
-      document.cookie = `access_token=${hashParams.access_token}`;
-      document.cookie = `refresh_token=${hashParams.refresh_token}`;
-    }
-    return hashParams;
   }
 
   async getUserPlaylists() {
@@ -185,77 +169,83 @@ class App extends React.Component {
 
   handleLogout() {
     this.setState({
-      loggedIn: false,
-      nowPlaying: {
-        name: "Nothing currently playing",
-        image: null,
+      spotify: {
+        loggedIn: false,
+        nowPlaying: {
+          name: 'Nothing currently playing',
+          image: null,
+        },
+        user_id: '',
+        access_token: '',
+        user_name: '',
+        showPlaylists: false,
+        pllibrary: null, 
       },
-      user_id: "",
-      access_token: "",
-      user_name: "",
-      showPlaylists: false,
-      showKeyCalculator: false,
-      pllibrary: null,
+      showKeyCalculator: false, 
     });
 
     window.location.href = window.location.origin;
+    localStorage.removeItem('spotify_hash_params');
+    localStorage.removeItem('soundcloud_hash_params');
   }
 
   render() {
     return (
-      <div className="App m-div">
+      <div className='App m-div'>
         <FadeIn transitionDuration={1000}>
-          {this.state.loggedIn ? (
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleLogout.bind(this)}
-              disabled={!this.state.loggedIn}
-            >
-              Log Out
-            </Button>
-          ) : (
-            <GreenButton
-              variant="contained"
-              color="primary"
-              style={
-                this.state.loggedIn
-                  ? { cursor: "none" }
-                  : { animation: "float 1s ease-in-out infinite" }
-              }
-              disabled={this.state.loggedIn}
-              onClick={() => {
-                if (!this.state.loggedIn) {
-                  window.location.href = server;
-                }
-              }}
-            >
-              Login with Spotify
-            </GreenButton>
-          )}
+          <div className='login'>
+            {this.state.spotify.loggedIn ? (
+              <SpotifyLogo 
+                className='logo-spotify'
+                onClick={this.handleLogout.bind(this)}
+              />
+            ) : (
+              <SpotifyLogo 
+                className='logo'
+                onClick={() => {
+                  if (!this.state.spotify.loggedIn) {
+                    window.location.href = spotifyLoginEndpoint;
+                  }
+                }}
+              />
+            )}
 
-          <div className="m-div">
-            Logged in as: <b>{this.state.user_name}</b>
+            {this.state.soundcloud.loggedIn ? (
+              <SoundcloudLogo
+                className='logo-soundcloud'
+                onClick={this.handleLogout.bind(this)}
+              />
+            ) : (
+              <SoundcloudLogo
+                className='logo'
+                onClick={() => {
+                  if (!this.state.soundcloud.loggedIn) {
+                    window.location.href = soundcloudLoginEndpoint;
+                  }
+                }}
+              />
+            )}
           </div>
+
           <Grid container spacing={2}>
             <Grid item xs={this.state.showPlaylists ? 4 : 12}>
-              <div className="current-song m-div">
+              <div className='current-song m-div'>
                 <CurrentSong token={this.state.access_token} />
               </div>
-              <div className="m-div">
+              <div className='m-div'>
                 <Button
-                  variant="contained"
+                  variant='contained'
                   onClick={this.getUserPlaylists}
-                  disabled={!this.state.loggedIn}
+                  disabled={!this.state.spotify.loggedIn}
                 >
                   {this.state.showPlaylists
-                    ? "Close Playlist Library"
-                    : "Open Playlist Library"}
+                    ? 'Close Playlist Library'
+                    : 'Open Playlist Library'}
                 </Button>
               </div>
 
-              <div className="m-div">
-                <Button variant="contained" onClick={this.openKeyCalculator}>
+              <div className='m-div'>
+                <Button variant='contained' onClick={this.openKeyCalculator}>
                   Key Calculator
                 </Button>
               </div>
@@ -281,24 +271,24 @@ class App extends React.Component {
               />
             </FadeIn>
           ) : null}
-          <div className="m-div">
-            <Typography variant="overline">Powered by Spotify</Typography>
+          <div className='m-div'>
+            <Typography variant='overline'>Powered by Spotify</Typography>
           </div>
-          <div className="m-div">
-            <Typography variant="caption">Made by Tam Nguyen</Typography>
+          <div className='m-div'>
+            <Typography variant='caption'>Made by Tam Nguyen</Typography>
           </div>
           {this.state.showPlaylists && (
             <>
               <Chip
-                label={"v" + changelog[0].version}
-                className="version-label"
+                label={'v' + changelog[0].version}
+                className='version-label'
               />
 
               <Chip
-                className="changelog"
-                style={{ padding: "0.3rem" }}
+                className='changelog'
+                style={{ padding: '0.3rem' }}
                 icon={<Receipt />}
-                label="Changelog"
+                label='Changelog'
                 onClick={() => {
                   this.setState({
                     openChangelog: true,
@@ -312,15 +302,15 @@ class App extends React.Component {
         {!this.state.showPlaylists && (
           <>
             <Chip
-              label={"v" + changelog[0].version}
-              className="version-label"
+              label={'v' + changelog[0].version}
+              className='version-label'
             />
 
             <Chip
-              className="changelog"
-              style={{ padding: "0.3rem" }}
+              className='changelog'
+              style={{ padding: '0.3rem' }}
               icon={<Receipt />}
-              label="Changelog"
+              label='Changelog'
               onClick={() => {
                 this.setState({
                   openChangelog: true,
@@ -331,7 +321,7 @@ class App extends React.Component {
         )}
         <Dialog
           fullWidth={true}
-          maxWidth="md"
+          maxWidth='md'
           open={this.state.openChangelog}
           onClose={this.handleCloseChangelog.bind(this)}
         >
@@ -341,12 +331,12 @@ class App extends React.Component {
               return (
                 <DialogContentText key={entry.version}>
                   <div>
-                    <Typography className="changelog-entry-header" variant="h6">
+                    <Typography className='changelog-entry-header' variant='h6'>
                       v{entry.version}
                     </Typography>
                     <Typography
-                      className="changelog-entry-header"
-                      variant="button"
+                      className='changelog-entry-header'
+                      variant='button'
                     >
                       {entry.date}
                     </Typography>
@@ -356,7 +346,7 @@ class App extends React.Component {
                       return (
                         <ListItem>
                           <ListItemIcon>
-                            {element.type === "bugfix" ? (
+                            {element.type === 'bugfix' ? (
                               <Build />
                             ) : (
                               <SettingsApplications />
@@ -375,32 +365,32 @@ class App extends React.Component {
           <DialogActions>
             <Button
               onClick={this.handleCloseChangelog.bind(this)}
-              color="primary"
+              color='primary'
             >
               Close
             </Button>
           </DialogActions>
         </Dialog>
 
-        <Dialog maxWidth="md" open={this.state.showSessionExpiryDialog}>
+        <Dialog maxWidth='md' open={this.state.showSessionExpiryDialog}>
           <DialogTitle>Oops!</DialogTitle>
           <DialogContent>
             Your Spotify session has expired. You can refresh your session for
             another hour by logging in again.
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleLogout.bind(this)} variant="outlined">
+            <Button onClick={this.handleLogout.bind(this)} variant='outlined'>
               Logout
             </Button>
             <Button
               onClick={() => {
-                window.location.href = server;
+                window.location.href = spotifyLoginEndpoint;
               }}
               style={{
-                backgroundColor: "#1ED760",
+                backgroundColor: '#1ED760',
               }}
-              color="primary"
-              variant="contained"
+              color='primary'
+              variant='contained'
             >
               Login
             </Button>

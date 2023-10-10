@@ -13,19 +13,17 @@ const cors = require("cors");
 const querystring = require("querystring");
 const cookieParser = require("cookie-parser");
 
-const client_id = process.env.SPOTIFY_ID; // Your client id
-const client_secret = process.env.SPOTIFY_SECRET; // Your secret
+const spotify_client_id = process.env.SPOTIFY_ID; // Your client id
+const spotify_client_secret = process.env.SPOTIFY_SECRET; // Your secret
+const soundcloud_client_id = process.env.SOUNDCLOUD_ID; 
+const soundcloud_secret = process.env.SOUNDCLOUD_SECRET;
+
 const isProduction = process.env.NODE_ENV === 'production';
 const redirect_uri = isProduction ? "https://key-track2.herokuapp.com/callback/" : "http://localhost:8888/callback";
 
-// Soundcloud Stuff
-// SC.initialize({
-//   client_id: "cKf4vDOFJQhksTD5LHptv0uG9P0gHZA0",
-//   redirect_uri: "CALLBACK_URL",
-// });
-
 /**
- * Generates a random string containing numbers and letters
+ * Generates a random string containing numbers and letters,
+ * acting as a random nonce for CSRF protection
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
@@ -40,7 +38,7 @@ const generateRandomString = function (length) {
   return text;
 };
 
-const stateKey = "spotify_auth_state";
+const SPOTIFY_STATE_KEY = "spotify_auth_state";
 
 const app = express();
 
@@ -49,9 +47,9 @@ app
   .use(cors())
   .use(cookieParser());
 
-app.get("/login", function (req, res) {
+app.get("/spotify/login", function (req, res) {
   const state = generateRandomString(16);
-  res.cookie(stateKey, state);
+  res.cookie(SPOTIFY_STATE_KEY, state);
 
   // your application requests authorization
   const scope =
@@ -61,7 +59,7 @@ app.get("/login", function (req, res) {
     "https://accounts.spotify.com/authorize?" +
     querystring.stringify({
       response_type: "code",
-      client_id: client_id,
+      client_id: spotify_client_id,
       scope: scope,
       redirect_uri: redirect_uri,
       state: state,
@@ -76,17 +74,19 @@ app.get("/callback", function (req, res) {
 
   const code = req.query.code || null;
   const state = req.query.state || null;
-  const storedState = req.cookies ? req.cookies[stateKey] : null;
+  const spotifyStoredState = req.cookies ? req.cookies[SPOTIFY_STATE_KEY] : null;
 
-  if (state === null || state !== storedState) {
+  if (state === null || state !== spotifyStoredState) {
     res.redirect(
       "/#" +
       querystring.stringify({
         error: "state_mismatch",
       })
     );
-  } else {
-    res.clearCookie(stateKey);
+  } else if (spotifyStoredState) {
+    // Spotify Flow
+    console.log("SPOTIFY FLOW");
+    res.clearCookie(SPOTIFY_STATE_KEY);
     const authOptions = {
       url: "https://accounts.spotify.com/api/token",
       form: {
@@ -97,7 +97,7 @@ app.get("/callback", function (req, res) {
       headers: {
         Authorization:
           "Basic " +
-          new Buffer(client_id + ":" + client_secret).toString("base64"),
+          new Buffer(spotify_client_id + ":" + spotify_client_secret).toString("base64"),
       },
       json: true,
     };
@@ -142,6 +142,8 @@ app.get("/callback", function (req, res) {
         );
       }
     });
+  } else {
+    // Soundcloud flow
   }
 });
 
@@ -153,7 +155,7 @@ app.get("/refresh_token", function (req, res) {
     headers: {
       Authorization:
         "Basic " +
-        new Buffer(client_id + ":" + client_secret).toString("base64"),
+        new Buffer(spotify_client_id + ":" + spotify_client_secret).toString("base64"),
     },
     form: {
       grant_type: "refresh_token",
@@ -172,5 +174,24 @@ app.get("/refresh_token", function (req, res) {
   });
 });
 
+app.get("/soundcloud/login", function (req, res) {
+  const state = generateRandomString(16);
+
+  // https://api.soundcloud.com/connect?client_id=iCyQg0vibTPEFK5kZNgdbWhvsZ8iV6Qx&redirect_uri=https://key-track.netlify.app/&response_type=code
+  res.redirect(
+    "https://api.soundcloud.com/connect?" +
+    querystring.stringify({
+      client_id: soundcloud_client_id,
+      redirect_uri: 'https://key-track.netlify.app/',
+      state: state,
+      response_type: "code",
+    })
+  );
+});
+
 console.log("Listening on 8888");
 app.listen(process.env.PORT || 8888);
+
+// . iCyQg0vibTPEFK5kZNgdbWhvsZ8iV6Qx
+// . R9TSEyiI6agFeG6TujyCT6SAgj4F3SWr
+//   https://key-track.netlify.app/
