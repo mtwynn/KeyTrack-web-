@@ -72,8 +72,8 @@ class App extends React.Component {
         showSessionExpiryDialog: false,
       },
       soundcloud: {
-        loggedIn: soundcloudParams.access_token ? true : false
-      }
+        loggedIn: soundcloudParams.access_token ? true : false,
+      },
     };
 
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
@@ -95,21 +95,19 @@ class App extends React.Component {
 
     // TODO: Move all the Axios.get calls to a utils function for API endpoints
     if (soundcloudParams.access_token) {
-      Axios.get('https://api.soundcloud.com/me', 
-        {
-          headers: {
-            'Accept': 'application/json; charset=utf-8',
-            'Authorization': `OAuth ${soundcloudParams.access_token}`
-          },
-        }
-      )
-      .then(response => {
-        // TODO: Do something with this response
-        console.log(response);
+      Axios.get('https://api.soundcloud.com/me', {
+        headers: {
+          Accept: 'application/json; charset=utf-8',
+          Authorization: `OAuth ${soundcloudParams.access_token}`,
+        },
       })
-      .catch(error => {
-        console.error(error);
-      });
+        .then((response) => {
+          // TODO: Do something with this response
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
   }
 
@@ -179,9 +177,9 @@ class App extends React.Component {
         access_token: '',
         user_name: '',
         showPlaylists: false,
-        pllibrary: null, 
+        pllibrary: null,
       },
-      showKeyCalculator: false, 
+      showKeyCalculator: false,
     });
 
     window.location.href = window.location.origin;
@@ -195,12 +193,12 @@ class App extends React.Component {
         <FadeIn transitionDuration={1000}>
           <div className='login'>
             {this.state.spotify.loggedIn ? (
-              <SpotifyLogo 
+              <SpotifyLogo
                 className='logo-spotify'
                 onClick={this.handleLogout.bind(this)}
               />
             ) : (
-              <SpotifyLogo 
+              <SpotifyLogo
                 className='logo'
                 onClick={() => {
                   if (!this.state.spotify.loggedIn) {
