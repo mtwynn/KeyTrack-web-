@@ -52,8 +52,8 @@ class App extends React.Component {
     super(props);
 
     // TODO move this to different component lifecycle
-    const spotifyParams = getHashParams();
-    const soundcloudParams = getHashParams('soundcloud');
+    const spotifyParams = getHashParams('spotify', isProduction);
+    const soundcloudParams = getHashParams('soundcloud', isProduction);
 
     this.state = {
       openChangelog: false,
@@ -91,6 +91,11 @@ class App extends React.Component {
           user_name: user.data.display_name,
         });
       });
+    } else {
+      console.error(
+        'Could not get a spotify access token. Received spotify params from server: ',
+        spotifyParams
+      );
     }
 
     // TODO: Move all the Axios.get calls to a utils function for API endpoints
