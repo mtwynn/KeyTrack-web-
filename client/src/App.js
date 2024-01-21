@@ -63,6 +63,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
+<<<<<<< Updated upstream
     const params = this.getHashParams();
 
     this.state = {
@@ -70,6 +71,27 @@ class App extends React.Component {
       nowPlaying: {
         name: "Nothing currently playing",
         image: null,
+=======
+    // TODO move this to different component lifecycle
+    
+    const soundcloudParams = getHashParams('soundcloud');
+
+    this.state = {
+      openChangelog: false,
+      showKeyCalculator: false,
+      spotify: {
+        loggedIn: false,
+        nowPlaying: {
+          name: 'Nothing currently playing',
+          image: null,
+        },
+        user_id: '',
+        access_token: '',
+        user_name: '',
+        showPlaylists: false,
+        pllibrary: null,
+        showSessionExpiryDialog: false,
+>>>>>>> Stashed changes
       },
       user_id: "",
       access_token: "",
@@ -84,6 +106,7 @@ class App extends React.Component {
     this.getUserPlaylists = this.getUserPlaylists.bind(this);
     this.openKeyCalculator = this.openKeyCalculator.bind(this);
 
+<<<<<<< Updated upstream
     if (params.access_token) {
       console.log("Access token accepted");
       spotifyWebApi.setAccessToken(params.access_token);
@@ -98,12 +121,56 @@ class App extends React.Component {
           access_token: params.access_token,
           user_name: user.data.display_name,
         });
+=======
+    // TODO: Move all the Axios.get calls to a utils function for API endpoints
+    if (soundcloudParams.access_token) {
+      Axios.get('https://api.soundcloud.com/me', 
+        {
+          headers: {
+            'Accept': 'application/json; charset=utf-8',
+            'Authorization': `OAuth ${soundcloudParams.access_token}`
+          },
+        }
+      )
+      .then(response => {
+        // TODO: Do something with this response
+        console.log(response);
+      })
+      .catch(error => {
+        console.error(error);
+>>>>>>> Stashed changes
       });
     }
   }
 
   componentDidMount() {
+<<<<<<< Updated upstream
     if (this.state.loggedIn) {
+=======
+    const spotifyParams = getHashParams();
+
+    if (spotifyParams.access_token) {
+      spotifyWebApi.setAccessToken(spotifyParams.access_token);
+
+      Axios.get(
+        `https://api.spotify.com/v1/me?access_token=${spotifyParams.access_token}`
+      ).then((user) => {
+        this.setState({
+          user_id: user.data.id,
+          access_token: spotifyParams.access_token,
+          user_name: user.data.display_name,
+          spotify: {
+            ...this.state.spotify,
+            loggedIn: true
+          }
+        });
+      }).catch(e => {
+        alert("Privacy Badger extension may cause this app to break. Please disable this and any adblockers.");
+      });
+    }
+
+    if (this.state.spotify.loggedIn) {
+>>>>>>> Stashed changes
       setTimeout(() => {
         this.setState({
           showSessionExpiryDialog: true,
@@ -352,9 +419,9 @@ class App extends React.Component {
                     </Typography>
                   </div>
                   <List dense={true}>
-                    {entry.changes.map((element) => {
+                    {entry.changes.map((element, idx) => {
                       return (
-                        <ListItem>
+                        <ListItem key={idx}>
                           <ListItemIcon>
                             {element.type === "bugfix" ? (
                               <Build />
@@ -382,7 +449,11 @@ class App extends React.Component {
           </DialogActions>
         </Dialog>
 
+<<<<<<< Updated upstream
         <Dialog maxWidth="md" open={this.state.showSessionExpiryDialog}>
+=======
+        <Dialog maxWidth='md' open={this.state.spotify.showSessionExpiryDialog}>
+>>>>>>> Stashed changes
           <DialogTitle>Oops!</DialogTitle>
           <DialogContent>
             Your Spotify session has expired. You can refresh your session for
